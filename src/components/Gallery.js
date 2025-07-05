@@ -396,32 +396,32 @@ const MenuDropdown = styled(motion.div)`
   position: absolute;
   top: 100%;
   right: 0;
-  background: rgba(0, 0, 0, 0.9);
+  background: rgba(0, 0, 0, 0.7);
   backdrop-filter: blur(15px);
-  border-radius: 10px;
-  padding: 8px 0;
-  min-width: 120px;
+  border-radius: 8px;
+  padding: 4px 0;
+  min-width: 80px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   z-index: 10;
   
   @media (max-width: 480px) {
-    min-width: 140px;
+    min-width: 100px;
   }
 `;
 
 const MenuItem = styled.button`
-  background: none;
+  background: transparent;
   border: none;
   color: white;
-  padding: 10px 16px;
+  padding: 6px 12px;
   width: 100%;
   text-align: left;
   cursor: pointer;
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-size: 0.9rem;
+  gap: 6px;
+  font-size: 0.8rem;
   transition: all 0.2s ease;
   
   &:hover {
@@ -431,8 +431,8 @@ const MenuItem = styled.button`
 
   
   @media (max-width: 480px) {
-    padding: 12px 18px;
-    font-size: 1rem;
+    padding: 8px 14px;
+    font-size: 0.9rem;
   }
 `;
 

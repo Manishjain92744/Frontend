@@ -270,7 +270,7 @@ const DeleteButton = styled(motion.button)`
   position: absolute;
   top: 8px;
   right: 8px;
-  background: rgba(231, 76, 60, 0.8);
+  background: transparent;
   border: none;
   color: white;
   width: 24px;
@@ -285,7 +285,7 @@ const DeleteButton = styled(motion.button)`
   transition: all 0.3s ease;
   
   &:hover {
-    background: #e74c3c;
+    background: rgba(231, 76, 60, 0.3);
     transform: scale(1.1);
   }
   

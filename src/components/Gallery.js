@@ -31,10 +31,7 @@ const Header = styled(motion.div)`
   align-items: center;
   margin-bottom: 30px;
   padding: 20px;
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
-  border-radius: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: transparent;
   flex-wrap: wrap;
   gap: 15px;
   position: fixed;
@@ -42,7 +39,6 @@ const Header = styled(motion.div)`
   left: 20px;
   right: 20px;
   z-index: 1000;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
 
   @media (max-width: 768px) {
     flex-direction: column;
@@ -709,20 +705,18 @@ const Gallery = () => {
               onClick={() => {
                 fetchImages();
                 fetchMusicFiles();
+                navigate('/');
               }}
               disabled={isRefreshing}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
-              <FaSync style={{ animation: isRefreshing ? 'spin 1s linear infinite' : 'none' }} /> 
-              {isRefreshing ? 'Refreshing...' : 'Refresh'}
-            </NavButton>
-            <NavButton
-              onClick={() => navigate('/')}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              <FaHome /> Home
+              <FaHome />
+              {isRefreshing ? (
+                <FaSync style={{ animation: 'spin 1s linear infinite' }} />
+              ) : (
+                'Home'
+              )}
             </NavButton>
           </HeaderControls>
         </Header>

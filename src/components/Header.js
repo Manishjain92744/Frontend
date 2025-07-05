@@ -6,6 +6,14 @@ const HeaderContainer = styled.header`
   color: white;
   padding: 30px 40px;
   text-align: center;
+  
+  @media (max-width: 768px) {
+    padding: 25px 20px;
+  }
+  
+  @media (max-width: 480px) {
+    padding: 20px 15px;
+  }
 `;
 
 const Title = styled.h1`
@@ -20,6 +28,14 @@ const Title = styled.h1`
   @media (max-width: 768px) {
     font-size: 2rem;
   }
+  
+  @media (max-width: 480px) {
+    font-size: 1.6rem;
+  }
+  
+  @media (max-width: 360px) {
+    font-size: 1.4rem;
+  }
 `;
 
 const Subtitle = styled.p`
@@ -27,6 +43,16 @@ const Subtitle = styled.p`
   font-size: 1.1rem;
   opacity: 0.9;
   font-weight: 300;
+  
+  @media (max-width: 768px) {
+    font-size: 1rem;
+    margin: 8px 0 0 0;
+  }
+  
+  @media (max-width: 480px) {
+    font-size: 0.9rem;
+    margin: 6px 0 0 0;
+  }
 `;
 
 const Header = () => {

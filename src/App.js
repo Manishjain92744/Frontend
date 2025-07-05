@@ -7,6 +7,7 @@ import Gallery from './components/Gallery';
 import UploadPage from './components/UploadPage';
 import MusicUploadPage from './components/MusicUploadPage';
 import GlobalStyle from './styles/GlobalStyle';
+import { AudioProvider } from './contexts/AudioContext';
 
 const AppContainer = styled(motion.div)`
   min-height: 100vh;
@@ -16,21 +17,23 @@ const AppContainer = styled(motion.div)`
 
 function App() {
   return (
-    <Router>
-      <GlobalStyle />
-      <AppContainer
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 1 }}
-      >
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/gallery" element={<Gallery />} />
-          <Route path="/upload" element={<UploadPage />} />
-          <Route path="/upload/music" element={<MusicUploadPage />} />
-        </Routes>
-      </AppContainer>
-    </Router>
+    <AudioProvider>
+      <Router>
+        <GlobalStyle />
+        <AppContainer
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 1 }}
+        >
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/gallery" element={<Gallery />} />
+            <Route path="/upload" element={<UploadPage />} />
+            <Route path="/upload/music" element={<MusicUploadPage />} />
+          </Routes>
+        </AppContainer>
+      </Router>
+    </AudioProvider>
   );
 }
 

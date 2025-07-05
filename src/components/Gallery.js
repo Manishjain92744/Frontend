@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { FaHeart, FaTimes, FaChevronLeft, FaChevronRight, FaHome, FaPlay, FaPause, FaSync, FaMusic, FaTrash, FaEllipsisV } from 'react-icons/fa';
 import axios from 'axios';
 import PhotoInteractions from './PhotoInteractions';
+import { useAudio } from '../contexts/AudioContext';
 
 const GalleryContainer = styled.div`
   min-height: 100vh;
@@ -145,50 +146,12 @@ const NavButton = styled(motion.button)`
   }
 `;
 
-const MusicSelector = styled.select`
-  background: rgba(255, 255, 255, 0.2);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  color: white;
-  padding: 8px 12px;
-  border-radius: 15px;
-  cursor: pointer;
-  font-size: 0.95rem;
-  backdrop-filter: blur(10px);
-  max-width: 160px;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  overflow: hidden;
-  appearance: none;
-
-  option {
-    background: #333;
-    color: white;
-  }
-
-  &:hover {
-    background: rgba(255, 255, 255, 0.3);
-  }
-
-  @media (max-width: 768px) {
-    font-size: 0.9rem;
-    padding: 7px 10px;
-    max-width: 140px;
-  }
-  
-  @media (max-width: 480px) {
-    width: 100%;
-    max-width: none;
-    font-size: 1rem;
-    padding: 10px 12px;
-  }
-`;
-
 const MusicControl = styled(motion.button)`
   background: rgba(255, 255, 255, 0.2);
   border: none;
   color: white;
-  width: 40px;
-  height: 40px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
   cursor: pointer;
   display: flex;
@@ -202,11 +165,13 @@ const MusicControl = styled(motion.button)`
   }
   
   @media (max-width: 480px) {
-    width: 44px;
-    height: 44px;
+    width: 48px;
+    height: 48px;
     font-size: 1.1rem;
   }
 `;
+
+
 
 const GalleryGrid = styled(motion.div)`
   display: flex;
@@ -501,30 +466,18 @@ const FooterMessage = styled.div`
 
 const Gallery = () => {
   const navigate = useNavigate();
+  const { isPlaying, toggleMusic } = useAudio();
   const [images, setImages] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedImage, setSelectedImage] = useState(null);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [audio] = useState(new Audio('/romantic-music.mp3'));
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const [musicFiles, setMusicFiles] = useState([]);
-  const [currentMusic, setCurrentMusic] = useState(null);
   const [deleting, setDeleting] = useState(false);
   const [openMenu, setOpenMenu] = useState(null);
 
   useEffect(() => {
-    audio.loop = true;
-    audio.volume = 0.2;
-    
     fetchImages();
-    fetchMusicFiles();
-    
-    return () => {
-      audio.pause();
-      audio.currentTime = 0;
-    };
-  }, [audio]);
+  }, []);
 
   // Auto-refresh when coming from upload page
   useEffect(() => {
@@ -532,7 +485,6 @@ const Gallery = () => {
     if (isFromUpload) {
       sessionStorage.removeItem('fromUpload');
       fetchImages();
-      fetchMusicFiles();
     }
   }, []);
 
@@ -549,36 +501,7 @@ const Gallery = () => {
     }
   };
 
-  const fetchMusicFiles = async () => {
-    try {
-      const response = await axios.get('http://localhost:8080/api/music');
-      setMusicFiles(response.data);
-      // Set the first music file as current if available
-      if (response.data.length > 0 && !currentMusic) {
-        setCurrentMusic(response.data[0]);
-      }
-    } catch (error) {
-      console.error('Error fetching music files:', error);
-    }
-  };
 
-  const toggleMusic = () => {
-    if (isPlaying) {
-      audio.pause();
-    } else {
-      if (currentMusic) {
-        audio.src = `http://localhost:8080/api/images/${currentMusic}`;
-        audio.play().catch(() => {
-          console.log('Audio autoplay blocked');
-        });
-      } else {
-        audio.play().catch(() => {
-          console.log('Audio autoplay blocked');
-        });
-      }
-    }
-    setIsPlaying(!isPlaying);
-  };
 
   const openLightbox = (image, index) => {
     setSelectedImage(image);
@@ -676,35 +599,17 @@ const Gallery = () => {
             <FaHeart /> Our Photo Gallery
           </Title>
           <HeaderControls>
-            {musicFiles.length > 0 && (
-              <MusicSelector
-                value={currentMusic || ''}
-                onChange={(e) => {
-                  setCurrentMusic(e.target.value);
-                  if (isPlaying) {
-                    audio.pause();
-                    setIsPlaying(false);
-                  }
-                }}
-              >
-                {musicFiles.map(music => (
-                  <option key={music} value={music}>
-                    {music.replace(/\.(mp3|wav|m4a)$/i, '')}
-                  </option>
-                ))}
-              </MusicSelector>
-            )}
             <MusicControl
               onClick={toggleMusic}
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
+              title={isPlaying ? 'Pause Music' : 'Play Music'}
             >
               {isPlaying ? <FaPause /> : <FaPlay />}
             </MusicControl>
             <NavButton
               onClick={() => {
                 fetchImages();
-                fetchMusicFiles();
                 navigate('/');
               }}
               disabled={isRefreshing}

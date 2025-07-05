@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
 import { FaHeart, FaPlay, FaPause, FaMusic } from 'react-icons/fa';
+import { useAudio } from '../contexts/AudioContext';
 
 const HomeContainer = styled.div`
   min-height: 100vh;
@@ -168,10 +169,67 @@ const Button = styled(motion.button)`
   }
 `;
 
-const MusicControl = styled(motion.button)`
+const MusicControlsContainer = styled.div`
   position: fixed;
   top: 20px;
   right: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 10;
+  
+  @media (max-width: 768px) {
+    top: 15px;
+    right: 15px;
+    gap: 8px;
+  }
+  
+  @media (max-width: 480px) {
+    top: 10px;
+    right: 10px;
+    gap: 6px;
+  }
+`;
+
+const MusicSelector = styled.select`
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: white;
+  padding: 8px 12px;
+  border-radius: 15px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  backdrop-filter: blur(10px);
+  max-width: 160px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  appearance: none;
+  text-align: center;
+
+  option {
+    background: #333;
+    color: white;
+  }
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.3);
+  }
+
+  @media (max-width: 768px) {
+    font-size: 0.8rem;
+    padding: 6px 10px;
+    max-width: 140px;
+  }
+  
+  @media (max-width: 480px) {
+    font-size: 0.75rem;
+    padding: 5px 8px;
+    max-width: 120px;
+  }
+`;
+
+const MusicControl = styled(motion.button)`
   width: 50px;
   height: 50px;
   border-radius: 50%;
@@ -184,8 +242,8 @@ const MusicControl = styled(motion.button)`
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 10;
   transition: all 0.3s ease;
+  align-self: center;
   
   &:hover {
     background: rgba(255, 255, 255, 0.3);
@@ -193,16 +251,12 @@ const MusicControl = styled(motion.button)`
   }
   
   @media (max-width: 768px) {
-    top: 15px;
-    right: 15px;
     width: 45px;
     height: 45px;
     font-size: 1.1rem;
   }
   
   @media (max-width: 480px) {
-    top: 10px;
-    right: 10px;
     width: 40px;
     height: 40px;
     font-size: 1rem;
@@ -228,29 +282,7 @@ const HeartIcon = styled(motion.div)`
 
 const HomePage = () => {
   const navigate = useNavigate();
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [audio] = useState(new Audio('/romantic-music.mp3')); // You'll need to add this file
-
-  useEffect(() => {
-    audio.loop = true;
-    audio.volume = 0.3;
-    
-    return () => {
-      audio.pause();
-      audio.currentTime = 0;
-    };
-  }, [audio]);
-
-  const toggleMusic = () => {
-    if (isPlaying) {
-      audio.pause();
-    } else {
-      audio.play().catch(() => {
-        console.log('Audio autoplay blocked');
-      });
-    }
-    setIsPlaying(!isPlaying);
-  };
+  const { isPlaying, musicFiles, currentMusic, toggleMusic, changeMusic } = useAudio();
 
   const generateHearts = () => {
     const hearts = [];
@@ -294,13 +326,29 @@ const HomePage = () => {
         ))}
       </FloatingHearts>
 
-      <MusicControl
-        onClick={toggleMusic}
-        whileHover={{ scale: 1.1 }}
-        whileTap={{ scale: 0.9 }}
-      >
-        {isPlaying ? <FaPause /> : <FaPlay />}
-      </MusicControl>
+      <MusicControlsContainer>
+        {musicFiles.length > 0 && (
+          <MusicSelector
+            value={currentMusic || ''}
+            onChange={(e) => {
+              changeMusic(e.target.value);
+            }}
+          >
+            {musicFiles.map(music => (
+              <option key={music} value={music}>
+                {music.replace(/\.(mp3|wav|m4a)$/i, '')}
+              </option>
+            ))}
+          </MusicSelector>
+        )}
+        <MusicControl
+          onClick={toggleMusic}
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.9 }}
+        >
+          {isPlaying ? <FaPause /> : <FaPlay />}
+        </MusicControl>
+      </MusicControlsContainer>
 
       <Content>
         <HeartIcon

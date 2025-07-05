@@ -10,18 +10,18 @@ const GalleryContainer = styled.div`
   min-height: 100vh;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   padding: 20px;
-  padding-top: 0; /* Remove top padding since header is sticky */
-  padding-bottom: 80px; /* Add space for footer */
+  padding-top: 20px; /* Add top padding for header */
+  padding-bottom: 100px; /* Increased space for footer */
   position: relative;
 
   @media (max-width: 768px) {
-    padding: 15px 10px 70px 10px;
-    padding-top: 0;
+    padding: 15px 10px 90px 10px;
+    padding-top: 15px;
   }
   
   @media (max-width: 480px) {
-    padding: 10px 8px 60px 8px;
-    padding-top: 0;
+    padding: 10px 8px 80px 8px;
+    padding-top: 10px;
   }
 `;
 
@@ -37,9 +37,11 @@ const Header = styled(motion.div)`
   border: 1px solid rgba(255, 255, 255, 0.2);
   flex-wrap: wrap;
   gap: 15px;
-  position: sticky;
+  position: fixed;
   top: 20px;
-  z-index: 100;
+  left: 20px;
+  right: 20px;
+  z-index: 1000;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
 
   @media (max-width: 768px) {
@@ -49,6 +51,8 @@ const Header = styled(motion.div)`
     padding: 16px 12px;
     margin-bottom: 20px;
     top: 15px;
+    left: 15px;
+    right: 15px;
   }
   
   @media (max-width: 480px) {
@@ -56,6 +60,8 @@ const Header = styled(motion.div)`
     gap: 12px;
     margin-bottom: 15px;
     top: 10px;
+    left: 10px;
+    right: 10px;
   }
 `;
 
@@ -207,25 +213,24 @@ const MusicControl = styled(motion.button)`
 `;
 
 const GalleryGrid = styled(motion.div)`
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 20px;
-  max-width: 1400px;
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+  max-width: 600px;
   margin: 0 auto;
+  margin-top: 120px; /* Space for fixed header */
+  width: 100%;
   
   @media (max-width: 768px) {
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    gap: 15px;
+    gap: 20px;
+    max-width: 500px;
+    margin-top: 140px; /* More space for stacked header on mobile */
   }
   
   @media (max-width: 480px) {
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 12px;
-  }
-  
-  @media (max-width: 360px) {
-    grid-template-columns: 1fr;
-    gap: 15px;
+    gap: 18px;
+    max-width: 100%;
+    margin-top: 160px; /* Even more space for mobile */
   }
 `;
 
@@ -236,6 +241,7 @@ const ImageCard = styled(motion.div)`
   cursor: pointer;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
   transition: all 0.3s ease;
+  width: 100%;
   
   &:hover {
     transform: translateY(-5px);
@@ -251,19 +257,24 @@ const ImageCard = styled(motion.div)`
 
 const Image = styled.img`
   width: 100%;
-  height: 250px;
+  height: 400px;
   object-fit: cover;
   transition: transform 0.3s ease;
+  border-radius: 15px;
   
   ${ImageCard}:hover & {
-    transform: scale(1.05);
+    transform: scale(1.02);
+  }
+  
+  @media (max-width: 768px) {
+    height: 350px;
   }
   
   @media (max-width: 480px) {
-    height: 200px;
+    height: 300px;
     
     ${ImageCard}:hover & {
-      transform: scale(1.02);
+      transform: scale(1.01);
     }
   }
 `;

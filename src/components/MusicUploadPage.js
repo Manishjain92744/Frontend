@@ -435,7 +435,12 @@ const MusicUploadPage = () => {
         <Title>
           <FaMusic /> Add Music to Our Gallery
         </Title>
-        <div style={{ display: 'flex', gap: '10px' }}>
+        <div style={{ 
+          display: 'flex', 
+          gap: '10px',
+          flexWrap: 'wrap',
+          justifyContent: 'center'
+        }}>
           <NavButton
             onClick={() => navigate('/upload')}
             whileHover={{ scale: 1.05 }}

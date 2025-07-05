@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import { motion } from 'framer-motion';
-import { FaHeart, FaComment, FaTimes, FaPaperPlane, FaTrash } from 'react-icons/fa';
+import { motion, AnimatePresence } from 'framer-motion';
+import { FaHeart, FaComment, FaTimes, FaPaperPlane, FaTrash, FaChevronDown, FaChevronUp } from 'react-icons/fa';
 import axios from 'axios';
 
 const InteractionsContainer = styled.div`
@@ -28,7 +28,7 @@ const InteractionsContainer = styled.div`
   }
 `;
 
-const CommentsContainer = styled.div`
+const CommentsContainer = styled(motion.div)`
   position: relative;
   background: rgba(255, 255, 255, 0.12);
   border-radius: 12px;
@@ -47,6 +47,68 @@ const CommentsContainer = styled.div`
   @media (max-width: 480px) {
     padding: 10px;
     margin-top: 5px;
+  }
+`;
+
+const CommentsHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  
+  @media (max-width: 480px) {
+    margin-bottom: 10px;
+    padding-bottom: 6px;
+  }
+`;
+
+const CommentsTitle = styled.h3`
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #ffd700;
+  
+  @media (max-width: 768px) {
+    font-size: 0.9rem;
+  }
+  
+  @media (max-width: 480px) {
+    font-size: 0.85rem;
+  }
+`;
+
+const CollapseButton = styled(motion.button)`
+  background: rgba(255, 255, 255, 0.15);
+  border: none;
+  color: white;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+  
+  &:hover {
+    background: rgba(255, 255, 255, 0.25);
+    transform: scale(1.1);
+  }
+  
+  @media (max-width: 768px) {
+    width: 36px;
+    height: 36px;
+    font-size: 0.9rem;
+  }
+  
+  @media (max-width: 480px) {
+    width: 40px;
+    height: 40px;
+    font-size: 1rem;
   }
 `;
 
@@ -121,6 +183,25 @@ const CommentsSection = styled.div`
   overflow-y: auto;
   margin-bottom: 15px;
   
+  /* Custom scrollbar */
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  &::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 3px;
+  }
+  
+  &::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.5);
+  }
+  
   @media (max-width: 768px) {
     max-height: 140px;
     margin-bottom: 12px;
@@ -166,6 +247,7 @@ const CommentAuthor = styled.div`
 const CommentText = styled.div`
   font-size: 0.85rem;
   line-height: 1.3;
+  word-wrap: break-word;
   
   @media (max-width: 480px) {
     font-size: 0.9rem;
@@ -237,6 +319,7 @@ const CommentForm = styled.form`
   @media (max-width: 480px) {
     gap: 8px;
     margin-top: 10px;
+    flex-direction: column;
   }
 `;
 
@@ -271,6 +354,7 @@ const CommentInput = styled.input`
   @media (max-width: 480px) {
     padding: 14px 16px;
     font-size: 1rem;
+    width: 100%;
   }
 `;
 
@@ -313,6 +397,8 @@ const SubmitButton = styled(motion.button)`
     padding: 14px 16px;
     font-size: 1rem;
     gap: 6px;
+    width: 100%;
+    justify-content: center;
   }
 `;
 
@@ -335,6 +421,7 @@ const PhotoInteractions = ({ photoName, show }) => {
   const [newComment, setNewComment] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [autoCollapseTimer, setAutoCollapseTimer] = useState(null);
 
   // Default user name for comments
   const defaultUserName = 'Lover';
@@ -346,6 +433,15 @@ const PhotoInteractions = ({ photoName, show }) => {
       fetchComments();
     }
   }, [photoName]);
+
+  // Clear auto-collapse timer when component unmounts or showComments changes
+  useEffect(() => {
+    return () => {
+      if (autoCollapseTimer) {
+        clearTimeout(autoCollapseTimer);
+      }
+    };
+  }, [autoCollapseTimer]);
 
   const fetchLikeStatus = async () => {
     try {
@@ -416,10 +512,16 @@ const PhotoInteractions = ({ photoName, show }) => {
       setShowSuccess(true);
       setTimeout(() => setShowSuccess(false), 3000);
       
-      // Auto-collapse comment box after 2 seconds
-      setTimeout(() => {
+      // Clear existing timer
+      if (autoCollapseTimer) {
+        clearTimeout(autoCollapseTimer);
+      }
+      
+      // Auto-collapse comment box after 3 seconds
+      const timer = setTimeout(() => {
         setShowComments(false);
-      }, 2000);
+      }, 3000);
+      setAutoCollapseTimer(timer);
     } catch (error) {
       console.error('Error adding comment:', error);
       console.error('Error details:', error.response?.data);
@@ -443,6 +545,24 @@ const PhotoInteractions = ({ photoName, show }) => {
     }
   };
 
+  const handleToggleComments = () => {
+    // Clear auto-collapse timer when manually toggling
+    if (autoCollapseTimer) {
+      clearTimeout(autoCollapseTimer);
+      setAutoCollapseTimer(null);
+    }
+    setShowComments(!showComments);
+  };
+
+  const handleCollapseComments = () => {
+    // Clear auto-collapse timer
+    if (autoCollapseTimer) {
+      clearTimeout(autoCollapseTimer);
+      setAutoCollapseTimer(null);
+    }
+    setShowComments(false);
+  };
+
   const formatTime = (dateString) => {
     const date = new Date(dateString);
     return date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
@@ -464,7 +584,7 @@ const PhotoInteractions = ({ photoName, show }) => {
           </InteractionButton>
           
           <InteractionButton
-            onClick={() => setShowComments(!showComments)}
+            onClick={handleToggleComments}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >
@@ -475,70 +595,91 @@ const PhotoInteractions = ({ photoName, show }) => {
         </InteractionButtons>
       </InteractionsContainer>
 
-      {showComments && (
-        <CommentsContainer>
-          <CommentsSection>
-            {comments.map((comment) => (
-              <CommentItem key={comment.id}>
-                <DeleteButton
-                  className="delete-button"
-                  onClick={() => handleDeleteComment(comment.id)}
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.9 }}
-                  title="Delete comment"
-                >
-                  <FaTrash />
-                </DeleteButton>
-                <CommentAuthor>{comment.authorName}</CommentAuthor>
-                <CommentText>{comment.commentText}</CommentText>
-                <CommentTime>{formatTime(comment.createdAt)}</CommentTime>
-              </CommentItem>
-            ))}
-            {comments.length === 0 && (
-              <div style={{ textAlign: 'center', opacity: 0.7, fontStyle: 'italic' }}>
-                No comments yet. Be the first to comment! 💕
-              </div>
-            )}
-          </CommentsSection>
+      <AnimatePresence>
+        {showComments && (
+          <CommentsContainer
+            initial={{ opacity: 0, y: -20, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -20, scale: 0.95 }}
+            transition={{ duration: 0.3, ease: "easeOut" }}
+          >
+            <CommentsHeader>
+              <CommentsTitle>
+                Comments ({comments.length})
+              </CommentsTitle>
+              <CollapseButton
+                onClick={handleCollapseComments}
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+                title="Collapse comments"
+              >
+                <FaChevronUp />
+              </CollapseButton>
+            </CommentsHeader>
 
-          {showSuccess && (
-            <SuccessMessage
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-            >
-              💕 Comment added successfully!
-            </SuccessMessage>
-          )}
-          
-          <CommentForm onSubmit={handleComment}>
-            <CommentInput
-              type="text"
-              placeholder="Write a romantic comment... 💕"
-              value={newComment}
-              onChange={(e) => setNewComment(e.target.value)}
-              required
-            />
-            <SubmitButton
-              type="submit"
-              disabled={isSubmitting || !newComment.trim()}
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
-            >
-              {isSubmitting ? (
-                <motion.div
-                  animate={{ rotate: 360 }}
-                  transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                >
-                  ⏳
-                </motion.div>
-              ) : (
-                <FaPaperPlane />
+            <CommentsSection>
+              {comments.map((comment) => (
+                <CommentItem key={comment.id}>
+                  <DeleteButton
+                    className="delete-button"
+                    onClick={() => handleDeleteComment(comment.id)}
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
+                    title="Delete comment"
+                  >
+                    <FaTrash />
+                  </DeleteButton>
+                  <CommentAuthor>{comment.authorName}</CommentAuthor>
+                  <CommentText>{comment.commentText}</CommentText>
+                  <CommentTime>{formatTime(comment.createdAt)}</CommentTime>
+                </CommentItem>
+              ))}
+              {comments.length === 0 && (
+                <div style={{ textAlign: 'center', opacity: 0.7, fontStyle: 'italic' }}>
+                  No comments yet. Be the first to comment! 💕
+                </div>
               )}
-            </SubmitButton>
-          </CommentForm>
-        </CommentsContainer>
-      )}
+            </CommentsSection>
+
+            {showSuccess && (
+              <SuccessMessage
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+              >
+                💕 Comment added successfully!
+              </SuccessMessage>
+            )}
+            
+            <CommentForm onSubmit={handleComment}>
+              <CommentInput
+                type="text"
+                placeholder="Write a romantic comment... 💕"
+                value={newComment}
+                onChange={(e) => setNewComment(e.target.value)}
+                required
+              />
+              <SubmitButton
+                type="submit"
+                disabled={isSubmitting || !newComment.trim()}
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+              >
+                {isSubmitting ? (
+                  <motion.div
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                  >
+                    ⏳
+                  </motion.div>
+                ) : (
+                  <FaPaperPlane />
+                )}
+              </SubmitButton>
+            </CommentForm>
+          </CommentsContainer>
+        )}
+      </AnimatePresence>
     </>
   );
 };

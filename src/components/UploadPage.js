@@ -2,7 +2,7 @@ import React, { useState, useCallback, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
-import { FaHeart, FaCloudUploadAlt, FaHome, FaCheck, FaTimes } from 'react-icons/fa';
+import { FaHeart, FaCloudUploadAlt, FaHome, FaCheck, FaTimes, FaMusic } from 'react-icons/fa';
 import axios from 'axios';
 
 const UploadContainer = styled.div`
@@ -436,7 +436,12 @@ const UploadPage = () => {
         <Title>
           <FaHeart /> Add Photos to Our Gallery
         </Title>
-        <div style={{ display: 'flex', gap: '10px' }}>
+        <div style={{ 
+          display: 'flex', 
+          gap: '10px',
+          flexWrap: 'wrap',
+          justifyContent: 'center'
+        }}>
           <NavButton
             onClick={() => navigate('/upload/music')}
             whileHover={{ scale: 1.05 }}

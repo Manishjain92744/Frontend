@@ -10,14 +10,18 @@ const GalleryContainer = styled.div`
   min-height: 100vh;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   padding: 20px;
+  padding-top: 0; /* Remove top padding since header is sticky */
+  padding-bottom: 80px; /* Add space for footer */
   position: relative;
 
   @media (max-width: 768px) {
-    padding: 15px 10px;
+    padding: 15px 10px 70px 10px;
+    padding-top: 0;
   }
   
   @media (max-width: 480px) {
-    padding: 10px 8px;
+    padding: 10px 8px 60px 8px;
+    padding-top: 0;
   }
 `;
 
@@ -33,6 +37,10 @@ const Header = styled(motion.div)`
   border: 1px solid rgba(255, 255, 255, 0.2);
   flex-wrap: wrap;
   gap: 15px;
+  position: sticky;
+  top: 20px;
+  z-index: 100;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
 
   @media (max-width: 768px) {
     flex-direction: column;
@@ -40,12 +48,14 @@ const Header = styled(motion.div)`
     gap: 16px;
     padding: 16px 12px;
     margin-bottom: 20px;
+    top: 15px;
   }
   
   @media (max-width: 480px) {
     padding: 12px 8px;
     gap: 12px;
     margin-bottom: 15px;
+    top: 10px;
   }
 `;
 

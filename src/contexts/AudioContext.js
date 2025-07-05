@@ -49,16 +49,13 @@ export const AudioProvider = ({ children }) => {
       audio.pause();
       setIsPlaying(false);
     } else {
-      if (currentMusic) {
+      // Only set src if it's different from current src or if no src is set
+      if (currentMusic && audio.src !== `http://localhost:8080/api/images/${currentMusic}`) {
         audio.src = `http://localhost:8080/api/images/${currentMusic}`;
-        audio.play().catch(() => {
-          console.log('Audio autoplay blocked');
-        });
-      } else {
-        audio.play().catch(() => {
-          console.log('Audio autoplay blocked');
-        });
       }
+      audio.play().catch(() => {
+        console.log('Audio autoplay blocked');
+      });
       setIsPlaying(true);
     }
   };

@@ -327,7 +327,7 @@ const HomePage = () => {
       </FloatingHearts>
 
       <MusicControlsContainer>
-        {musicFiles.length > 0 && (
+        {musicFiles.length > 0 && isPlaying && (
           <MusicSelector
             value={currentMusic || ''}
             onChange={(e) => {

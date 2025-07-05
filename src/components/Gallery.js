@@ -474,6 +474,7 @@ const Gallery = () => {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [openMenu, setOpenMenu] = useState(null);
+  const [deleteSuccess, setDeleteSuccess] = useState(false);
 
   useEffect(() => {
     fetchImages();
@@ -552,8 +553,15 @@ const Gallery = () => {
     try {
       await axios.delete(`http://localhost:8080/api/images/${encodeURIComponent(image)}`);
       setImages((prev) => prev.filter((img) => img !== image));
+      // Close lightbox if the deleted image was selected
+      if (selectedImage === image) {
+        closeLightbox();
+      }
+      setDeleteSuccess(true);
+      setTimeout(() => setDeleteSuccess(false), 3000);
     } catch (error) {
-      alert('Failed to delete photo.');
+      console.error('Error deleting photo:', error);
+      alert(`Failed to delete photo: ${error.response?.data || error.message}`);
     } finally {
       setDeleting(false);
     }
@@ -680,6 +688,27 @@ const Gallery = () => {
             </ImageCard>
           ))}
         </GalleryGrid>
+
+        {deleteSuccess && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 20 }}
+            style={{
+              position: 'fixed',
+              top: '20px',
+              right: '20px',
+              background: '#27ae60',
+              color: 'white',
+              padding: '12px 20px',
+              borderRadius: '10px',
+              zIndex: 1000,
+              boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
+            }}
+          >
+            ✅ Photo deleted successfully!
+          </motion.div>
+        )}
 
         <AnimatePresence>
           {selectedImage && (

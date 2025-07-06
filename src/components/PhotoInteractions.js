@@ -423,8 +423,19 @@ const PhotoInteractions = ({ photoName, show }) => {
   const [showSuccess, setShowSuccess] = useState(false);
   const [autoCollapseTimer, setAutoCollapseTimer] = useState(null);
 
-  // Default user name for comments
-  const defaultUserName = 'Lover';
+  // Get current user from localStorage
+  const getCurrentUser = () => {
+    try {
+      const user = localStorage.getItem('user');
+      return user ? JSON.parse(user) : null;
+    } catch (error) {
+      console.error('Error parsing user from localStorage:', error);
+      return null;
+    }
+  };
+
+  const currentUser = getCurrentUser();
+  const userName = currentUser ? currentUser.username : 'Anonymous';
 
   useEffect(() => {
     if (photoName) {
@@ -445,7 +456,7 @@ const PhotoInteractions = ({ photoName, show }) => {
 
   const fetchLikeStatus = async () => {
     try {
-      const response = await axios.get(`http://localhost:8080/api/likes/${photoName}/user/${defaultUserName}`);
+      const response = await axios.get(`http://localhost:8080/api/likes/${photoName}/user/${userName}`);
       setLiked(response.data);
     } catch (error) {
       console.error('Error fetching like status:', error);
@@ -474,7 +485,7 @@ const PhotoInteractions = ({ photoName, show }) => {
     try {
       const response = await axios.post('http://localhost:8080/api/likes', {
         photoName: photoName,
-        userName: defaultUserName
+        userName: userName
       });
       setLiked(response.data.liked);
       setLikeCount(response.data.likeCount);
@@ -497,7 +508,7 @@ const PhotoInteractions = ({ photoName, show }) => {
       const commentData = {
         photoName: photoName,
         commentText: newComment.trim(),
-        authorName: defaultUserName
+        authorName: userName
       };
       
       console.log('Sending comment data:', commentData);

@@ -83,6 +83,26 @@ const Title = styled(motion.h1)`
   }
 `;
 
+const DelhiWelcome = styled(motion.h2)`
+  font-size: 1.8rem;
+  color: #ff6b6b;
+  margin-bottom: 15px;
+  font-weight: 600;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  font-family: 'Pacifico', cursive;
+  letter-spacing: 1px;
+  
+  @media (max-width: 768px) {
+    font-size: 1.5rem;
+    margin-bottom: 12px;
+  }
+  
+  @media (max-width: 480px) {
+    font-size: 1.3rem;
+    margin-bottom: 10px;
+  }
+`;
+
 const Subtitle = styled(motion.p)`
   font-size: 1.5rem;
   color: rgba(255, 255, 255, 0.9);
@@ -631,10 +651,18 @@ const HomePage = ({ currentUser, onLogout }) => {
           ❤️
         </HeartIcon>
         
+        <DelhiWelcome
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1, delay: 0.1 }}
+        >
+          Welcome to Delhi My Love 💕
+        </DelhiWelcome>
+        
         <Title
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1, delay: 0.2 }}
+          transition={{ duration: 1, delay: 0.3 }}
         >
           Memory Lane
         </Title>
@@ -642,7 +670,7 @@ const HomePage = ({ currentUser, onLogout }) => {
         <Subtitle
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1, delay: 0.4 }}
+          transition={{ duration: 1, delay: 0.5 }}
         >
           A Journey of Us • Our Love Story in Pictures
         </Subtitle>
@@ -650,7 +678,7 @@ const HomePage = ({ currentUser, onLogout }) => {
         <ButtonContainer
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1, delay: 0.6 }}
+          transition={{ duration: 1, delay: 0.7 }}
         >
           <Button
             className="primary"

@@ -331,7 +331,7 @@ const MessagePage = ({ currentUser, onLogout }) => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, delay: 0.2 }}
         >
-          A Special Message
+          Special Message for you Sunshine ✨
         </Title>
         
         <Subtitle

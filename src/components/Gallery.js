@@ -1121,7 +1121,7 @@ const Gallery = ({ currentUser, onLogout }) => {
         whileTap={{ scale: 0.95 }}
         style={{ margin: '10px auto', display: 'block' }}
       >
-        💕 Some Message for You My Love 💕
+        💕 Message for You My Love 💕
       </MessageButton>
       
       <FooterMessage>

@@ -626,26 +626,30 @@ const FooterMessage = styled.div`
   left: 0;
   right: 0;
   bottom: 0;
-  background: none;
-  color: #fff;
+  color: white;
   font-family: 'Pacifico', cursive;
-  font-size: 1.1rem;
+  font-size: 1.2rem;
   text-align: center;
-  padding: 10px 0 14px 0;
+  padding: 12px 0 16px 0;
   z-index: 9999;
-  letter-spacing: 1px;
-  text-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  letter-spacing: 1.5px;
+  text-shadow: 
+    0 0 20px rgba(255, 255, 255, 1),
+    0 2px 10px rgba(0, 0, 0, 0.5),
+    0 0 40px rgba(255, 255, 255, 0.8);
   pointer-events: none;
   user-select: none;
 
   @media (max-width: 768px) {
-    font-size: 1rem;
-    padding: 8px 0 12px 0;
+    font-size: 1.1rem;
+    padding: 10px 0 14px 0;
+    letter-spacing: 1.2px;
   }
   
   @media (max-width: 480px) {
-    font-size: 0.9rem;
-    padding: 6px 0 10px 0;
+    font-size: 1rem;
+    padding: 8px 0 12px 0;
+    letter-spacing: 1px;
   }
 `;
 

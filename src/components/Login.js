@@ -163,6 +163,38 @@ const HeartIcon = styled(motion.div)`
   margin-bottom: 20px;
 `;
 
+const FooterMessage = styled.div`
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  color: white;
+  font-family: 'Pacifico', cursive;
+  font-size: 1.2rem;
+  text-align: center;
+  padding: 12px 0 16px 0;
+  z-index: 9999;
+  letter-spacing: 1.5px;
+  text-shadow: 
+    0 0 20px rgba(255, 255, 255, 1),
+    0 2px 10px rgba(0, 0, 0, 0.5),
+    0 0 40px rgba(255, 255, 255, 0.8);
+  pointer-events: none;
+  user-select: none;
+
+  @media (max-width: 768px) {
+    font-size: 1.1rem;
+    padding: 10px 0 14px 0;
+    letter-spacing: 1.2px;
+  }
+  
+  @media (max-width: 480px) {
+    font-size: 1rem;
+    padding: 8px 0 12px 0;
+    letter-spacing: 1px;
+  }
+`;
+
 const Login = ({ onLoginSuccess, onSwitchToSignup }) => {
   const [formData, setFormData] = useState({
     username: '',
@@ -295,6 +327,10 @@ const Login = ({ onLoginSuccess, onSwitchToSignup }) => {
           </a>
         </SignupLink>
       </LoginCard>
+      
+      <FooterMessage>
+        Made with ❤️ by the one who loves you the most
+      </FooterMessage>
     </LoginContainer>
   );
 };

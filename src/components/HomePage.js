@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
-import { motion } from 'framer-motion';
-import { FaHeart, FaPlay, FaPause, FaMusic } from 'react-icons/fa';
+import { motion, AnimatePresence } from 'framer-motion';
+import { FaHeart, FaPlay, FaPause, FaMusic, FaUser } from 'react-icons/fa';
 import { useAudio } from '../contexts/AudioContext';
 
 const HomeContainer = styled.div`
@@ -344,32 +344,7 @@ const UserInfo = styled.div`
   }
 `;
 
-const LogoutButton = styled.button`
-  background: rgba(255, 107, 107, 0.8);
-  border: none;
-  border-radius: 20px;
-  padding: 8px 16px;
-  color: white;
-  font-size: 0.9rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  
-  &:hover {
-    background: rgba(255, 107, 107, 1);
-    transform: translateY(-1px);
-  }
-  
-  @media (max-width: 768px) {
-    font-size: 0.8rem;
-    padding: 6px 12px;
-  }
-  
-  @media (max-width: 480px) {
-    font-size: 0.75rem;
-    padding: 5px 10px;
-  }
-`;
+
 
 const WelcomeMessage = styled.div`
   color: #fefefe;
@@ -395,9 +370,82 @@ const WelcomeMessage = styled.div`
   }
 `;
 
+const PersonIcon = styled(motion.button)`
+  border: none;
+  color: white;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  
+  &:hover {
+    transform: scale(1.1);
+  }
+  
+  @media (max-width: 480px) {
+    width: 48px;
+    height: 48px;
+    font-size: 1.1rem;
+  }
+`;
+
+const PersonDropdown = styled(motion.div)`
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 8px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+  min-width: 150px;
+  z-index: 1001;
+  
+  @media (max-width: 480px) {
+    min-width: 140px;
+  }
+`;
+
+const DropdownItem = styled.button`
+  width: 100%;
+  padding: 12px 16px;
+  border: none;
+  background: transparent;
+  color: #333;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: all 0.2s ease;
+  
+  &:hover {
+    background: rgba(102, 126, 234, 0.1);
+    color: #667eea;
+  }
+  
+  &:first-child {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  }
+  
+  @media (max-width: 480px) {
+    padding: 14px 16px;
+    font-size: 1rem;
+  }
+`;
+
 const HomePage = ({ currentUser, onLogout }) => {
   const navigate = useNavigate();
   const { isPlaying, musicFiles, currentMusic, toggleMusic, changeMusic } = useAudio();
+  const [showPersonDropdown, setShowPersonDropdown] = useState(false);
 
   const generateHearts = () => {
     const hearts = [];
@@ -411,6 +459,28 @@ const HomePage = ({ currentUser, onLogout }) => {
       });
     }
     return hearts;
+  };
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = () => {
+      setShowPersonDropdown(false);
+    };
+
+    if (showPersonDropdown) {
+      document.addEventListener('click', handleClickOutside);
+      return () => document.removeEventListener('click', handleClickOutside);
+    }
+  }, [showPersonDropdown]);
+
+  const togglePersonDropdown = (e) => {
+    e.stopPropagation();
+    setShowPersonDropdown(!showPersonDropdown);
+  };
+
+  const handleLogoutClick = () => {
+    setShowPersonDropdown(false);
+    onLogout();
   };
 
   return (
@@ -473,9 +543,49 @@ const HomePage = ({ currentUser, onLogout }) => {
           {isPlaying ? 'Pause' : 'Play'}
         </MusicControl>
         {currentUser && (
-          <LogoutButton onClick={onLogout}>
-            Logout
-          </LogoutButton>
+          <div style={{ position: 'relative' }}>
+            <PersonIcon
+              onClick={togglePersonDropdown}
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+              title="User menu"
+              style={{
+                background: currentUser.profilePicture ? 'transparent' : 'rgba(255, 255, 255, 0.2)',
+                padding: 0,
+                border: 'none'
+              }}
+            >
+              {currentUser.profilePicture ? (
+                <img 
+                  src={`http://localhost:8080/api/auth/profile-pictures/${currentUser.profilePicture}`}
+                  alt="Profile"
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'cover',
+                    borderRadius: '50%',
+                    border: '2px solid rgba(255, 255, 255, 0.3)'
+                  }}
+                />
+              ) : (
+                <FaUser />
+              )}
+            </PersonIcon>
+            <AnimatePresence>
+              {showPersonDropdown && (
+                <PersonDropdown
+                  initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <DropdownItem onClick={handleLogoutClick}>
+                    Logout
+                  </DropdownItem>
+                </PersonDropdown>
+              )}
+            </AnimatePresence>
+          </div>
         )}
       </MusicControlsContainer>
 

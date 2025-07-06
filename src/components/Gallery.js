@@ -259,7 +259,6 @@ const LogoutButton = styled.button`
 `;
 
 const PersonIcon = styled(motion.button)`
-  background: ${props => props.profilePicture ? 'none' : 'rgba(255, 255, 255, 0.2)'};
   border: none;
   color: white;
   width: 44px;
@@ -269,19 +268,11 @@ const PersonIcon = styled(motion.button)`
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.3s ease;
+  transition: transform 0.3s ease;
   position: relative;
   overflow: hidden;
   
-  ${props => props.profilePicture && `
-    background-image: url(${props.profilePicture});
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-  `}
-  
   &:hover {
-    background: ${props => props.profilePicture ? 'rgba(255, 255, 255, 0.1)' : 'rgba(255, 255, 255, 0.3)'};
     transform: scale(1.1);
   }
   
@@ -835,9 +826,27 @@ const Gallery = ({ currentUser, onLogout }) => {
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.9 }}
                   title="User menu"
-                  profilePicture={currentUser.profilePicture ? `http://localhost:8080/api/auth/profile-pictures/${currentUser.profilePicture}` : null}
+                  style={{
+                    background: currentUser.profilePicture ? 'transparent' : 'rgba(255, 255, 255, 0.2)',
+                    padding: 0,
+                    border: 'none'
+                  }}
                 >
-                  {!currentUser.profilePicture && <FaUser />}
+                  {currentUser.profilePicture ? (
+                    <img 
+                      src={`http://localhost:8080/api/auth/profile-pictures/${currentUser.profilePicture}`}
+                      alt="Profile"
+                      style={{
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'cover',
+                        borderRadius: '50%',
+                        border: '2px solid rgba(255, 255, 255, 0.3)'
+                      }}
+                    />
+                  ) : (
+                    <FaUser />
+                  )}
                 </PersonIcon>
                 <AnimatePresence>
                   {showPersonDropdown && (

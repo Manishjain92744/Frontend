@@ -1,8 +1,8 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import styled from 'styled-components';
-import { motion } from 'framer-motion';
-import { FaHeart, FaCloudUploadAlt, FaHome, FaCheck, FaTimes, FaMusic } from 'react-icons/fa';
+import { motion, AnimatePresence } from 'framer-motion';
+import { FaHeart, FaCloudUploadAlt, FaHome, FaCheck, FaTimes, FaMusic, FaUser } from 'react-icons/fa';
 import axios from 'axios';
 
 const UploadContainer = styled.div`
@@ -88,34 +88,52 @@ const Title = styled.h1`
 `;
 
 const NavButton = styled(motion.button)`
-  background: rgba(255, 255, 255, 0.2);
+  padding: 12px 24px;
+  font-size: 1rem;
+  font-weight: 600;
   border: none;
-  color: white;
-  padding: 10px 20px;
-  border-radius: 25px;
+  border-radius: 50px;
   cursor: pointer;
+  transition: all 0.3s ease;
   display: flex;
   align-items: center;
   gap: 8px;
-  font-weight: 500;
-  transition: all 0.3s ease;
+  color: white;
   white-space: nowrap;
   
-  &:hover {
-    background: rgba(255, 255, 255, 0.3);
-    transform: translateY(-2px);
+  &.primary {
+    background: linear-gradient(45deg, #ff6b6b, #ff8e8e);
+    box-shadow: 0 6px 20px rgba(255, 107, 107, 0.3);
+    
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(255, 107, 107, 0.4);
+    }
+  }
+  
+  &.secondary {
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    
+    &:hover {
+      background: rgba(255, 255, 255, 0.3);
+      transform: translateY(-2px);
+    }
   }
   
   @media (max-width: 768px) {
-    padding: 8px 16px;
+    padding: 10px 20px;
     font-size: 0.9rem;
+    gap: 6px;
   }
   
   @media (max-width: 480px) {
     width: 100%;
     justify-content: center;
-    padding: 12px 16px;
+    padding: 14px 20px;
     font-size: 1rem;
+    gap: 8px;
   }
 `;
 
@@ -123,6 +141,37 @@ const UserInfoContainer = styled.div`
   position: fixed;
   top: 20px;
   right: 20px;
+  z-index: 10;
+`;
+
+const WelcomeMessage = styled.div`
+  color: #fefefe;
+  font-size: 1rem;
+  font-weight: 600;
+  text-align: center;
+  padding: 8px 16px;
+  border-radius: 20px;
+  background: linear-gradient(135deg, rgba(255, 107, 157, 0.9) 0%, rgba(196, 69, 105, 0.9) 50%, rgba(255, 142, 142, 0.9) 100%);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 4px 15px rgba(255, 107, 157, 0.4);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  
+  @media (max-width: 768px) {
+    font-size: 0.9rem;
+    padding: 6px 12px;
+  }
+  
+  @media (max-width: 480px) {
+    font-size: 0.85rem;
+    padding: 5px 10px;
+  }
+`;
+
+const LeftUserInfoContainer = styled.div`
+  position: fixed;
+  top: 20px;
+  left: 20px;
   display: flex;
   align-items: center;
   gap: 15px;
@@ -130,63 +179,69 @@ const UserInfoContainer = styled.div`
   
   @media (max-width: 768px) {
     top: 15px;
-    right: 15px;
+    left: 15px;
     gap: 10px;
   }
   
   @media (max-width: 480px) {
     top: 10px;
-    right: 10px;
+    left: 10px;
     gap: 8px;
   }
 `;
 
-const UserInfo = styled.div`
-  background: rgba(255, 255, 255, 0.2);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  border-radius: 25px;
-  padding: 8px 16px;
+const PersonIcon = styled(motion.button)`
+  border: none;
   color: white;
-  font-size: 0.9rem;
-  font-weight: 500;
-  
-  @media (max-width: 768px) {
-    font-size: 0.8rem;
-    padding: 6px 12px;
-  }
-  
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  &:hover { transform: scale(1.1); }
   @media (max-width: 480px) {
-    font-size: 0.75rem;
-    padding: 5px 10px;
+    width: 48px;
+    height: 48px;
+    font-size: 1.1rem;
   }
 `;
 
-const LogoutButton = styled.button`
-  background: rgba(255, 107, 107, 0.8);
+const PersonDropdown = styled(motion.div)`
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 8px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+  min-width: 150px;
+  z-index: 1001;
+  @media (max-width: 480px) { min-width: 140px; }
+`;
+
+const DropdownItem = styled.button`
+  width: 100%;
+  padding: 12px 16px;
   border: none;
-  border-radius: 20px;
-  padding: 8px 16px;
-  color: white;
+  background: transparent;
+  color: #333;
   font-size: 0.9rem;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.3s ease;
-  
-  &:hover {
-    background: rgba(255, 107, 107, 1);
-    transform: translateY(-1px);
-  }
-  
-  @media (max-width: 768px) {
-    font-size: 0.8rem;
-    padding: 6px 12px;
-  }
-  
-  @media (max-width: 480px) {
-    font-size: 0.75rem;
-    padding: 5px 10px;
-  }
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: all 0.2s ease;
+  &:hover { background: rgba(102, 126, 234, 0.1); color: #667eea; }
+  &:first-child { border-bottom: 1px solid rgba(0, 0, 0, 0.1); }
+  @media (max-width: 480px) { padding: 14px 16px; font-size: 1rem; }
 `;
 
 const FooterMessage = styled.div`
@@ -224,62 +279,71 @@ const FooterMessage = styled.div`
 const UploadArea = styled(motion.div)`
   width: 100%;
   max-width: 800px;
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
-  border-radius: 20px;
-  border: 2px dashed rgba(255, 255, 255, 0.3);
-  padding: 60px 40px;
+  background: linear-gradient(135deg, rgba(255, 182, 193, 0.18) 0%, rgba(186, 104, 200, 0.18) 100%);
+  backdrop-filter: blur(16px) saturate(120%);
+  border-radius: 28px;
+  border: 2.5px dashed rgba(255, 255, 255, 0.35);
+  padding: 70px 48px;
   text-align: center;
   cursor: pointer;
-  transition: all 0.3s ease;
-  
+  transition: all 0.3s cubic-bezier(.4,2,.3,1);
+  box-shadow: 0 8px 40px 0 rgba(255, 107, 170, 0.13), 0 2px 32px 0 rgba(186, 104, 200, 0.10);
+  font-family: 'Pacifico', 'Caveat', cursive, sans-serif;
+  position: relative;
+  overflow: visible;
+
   &:hover {
-    border-color: rgba(255, 255, 255, 0.5);
-    background: rgba(255, 255, 255, 0.15);
-  }
-  
-  &.drag-over {
     border-color: #ff6b6b;
-    background: rgba(255, 107, 107, 0.1);
+    background: linear-gradient(135deg, rgba(255, 182, 193, 0.28) 0%, rgba(186, 104, 200, 0.28) 100%);
+    box-shadow: 0 12px 48px 0 rgba(255, 107, 170, 0.18), 0 4px 40px 0 rgba(186, 104, 200, 0.15);
+    transform: scale(1.02) translateY(-2px);
   }
-  
+
+  &::before {
+    content: '💖';
+    position: absolute;
+    top: -2.2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 2.2rem;
+    opacity: 0.7;
+    filter: blur(0.5px);
+    pointer-events: none;
+    animation: heartFloat 4s ease-in-out infinite;
+  }
+
+  @keyframes heartFloat {
+    0% { opacity: 0.7; transform: translateX(-50%) scale(1); }
+    50% { opacity: 1; transform: translateX(-50%) scale(1.15); }
+    100% { opacity: 0.7; transform: translateX(-50%) scale(1); }
+  }
+
   @media (max-width: 768px) {
     padding: 40px 20px;
+    border-radius: 18px;
   }
   
   @media (max-width: 480px) {
-    padding: 30px 15px;
-  }
-`;
-
-const UploadIcon = styled.div`
-  font-size: 4rem;
-  color: rgba(255, 255, 255, 0.7);
-  margin-bottom: 20px;
-  
-  @media (max-width: 768px) {
-    font-size: 3rem;
-    margin-bottom: 15px;
-  }
-  
-  @media (max-width: 480px) {
-    font-size: 2.5rem;
-    margin-bottom: 12px;
+    padding: 30px 10px;
+    border-radius: 12px;
   }
 `;
 
 const UploadText = styled.div`
-  color: white;
-  font-size: 1.2rem;
+  color: #fff;
+  font-size: 1.5rem;
   margin-bottom: 10px;
+  font-family: 'Pacifico', 'Caveat', cursive, sans-serif;
+  letter-spacing: 1.2px;
+  text-shadow: 0 2px 8px rgba(255, 107, 170, 0.18);
   
   @media (max-width: 768px) {
-    font-size: 1.1rem;
+    font-size: 1.2rem;
     margin-bottom: 8px;
   }
   
   @media (max-width: 480px) {
-    font-size: 1rem;
+    font-size: 1.05rem;
     margin-bottom: 6px;
   }
 `;
@@ -432,6 +496,29 @@ const ErrorMessage = styled(motion.div)`
   }
 `;
 
+const UploadIcon = styled.div`
+  font-size: 4.5rem;
+  color: #ff6b6b;
+  margin-bottom: 20px;
+  animation: iconPulse 2.5s infinite cubic-bezier(.4,2,.3,1);
+  
+  @keyframes iconPulse {
+    0% { transform: scale(1); filter: drop-shadow(0 0 0 #ff6b6b); }
+    50% { transform: scale(1.12); filter: drop-shadow(0 0 16px #ff6b6b); }
+    100% { transform: scale(1); filter: drop-shadow(0 0 0 #ff6b6b); }
+  }
+  
+  @media (max-width: 768px) {
+    font-size: 3.2rem;
+    margin-bottom: 15px;
+  }
+  
+  @media (max-width: 480px) {
+    font-size: 2.2rem;
+    margin-bottom: 12px;
+  }
+`;
+
 const UploadPage = ({ currentUser, onLogout }) => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -439,6 +526,7 @@ const UploadPage = ({ currentUser, onLogout }) => {
   const [uploads, setUploads] = useState([]);
   const [isUploading, setIsUploading] = useState(false);
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+  const [showPersonDropdown, setShowPersonDropdown] = useState(false);
 
   const generateHearts = () => {
     const hearts = [];
@@ -477,6 +565,8 @@ const UploadPage = ({ currentUser, onLogout }) => {
   }, []);
 
   const handleFiles = async (files) => {
+    const MAX_FILE_SIZE = 20 * 1024 * 1024; // 20 MB in bytes
+    
     const imageFiles = files.filter(file => 
       file.type.startsWith('image/') && 
       ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'].includes(file.type)
@@ -484,6 +574,14 @@ const UploadPage = ({ currentUser, onLogout }) => {
 
     if (imageFiles.length === 0) {
       alert('Please select only image files (JPEG, PNG, GIF, WebP)');
+      return;
+    }
+
+    // Check file sizes
+    const oversizedFiles = imageFiles.filter(file => file.size > MAX_FILE_SIZE);
+    if (oversizedFiles.length > 0) {
+      const fileNames = oversizedFiles.map(f => f.name).join(', ');
+      alert(`The following files are too large (max 20MB each): ${fileNames}`);
       return;
     }
 
@@ -560,6 +658,21 @@ const UploadPage = ({ currentUser, onLogout }) => {
     }
   };
 
+  const togglePersonDropdown = (e) => {
+    e.stopPropagation();
+    setShowPersonDropdown(!showPersonDropdown);
+  };
+
+  const handleHomeClick = () => {
+    setShowPersonDropdown(false);
+    navigate('/');
+  };
+
+  const handleLogoutClick = () => {
+    setShowPersonDropdown(false);
+    onLogout();
+  };
+
   return (
     <UploadContainer>
       <FloatingHearts>
@@ -587,44 +700,86 @@ const UploadPage = ({ currentUser, onLogout }) => {
       </FloatingHearts>
       
       {currentUser && (
-        <UserInfoContainer>
-          <UserInfo>
+        <LeftUserInfoContainer>
+          <WelcomeMessage>
             Welcome, {currentUser.username}!
-          </UserInfo>
-          <LogoutButton onClick={onLogout}>
-            Logout
-          </LogoutButton>
-        </UserInfoContainer>
+          </WelcomeMessage>
+        </LeftUserInfoContainer>
       )}
       
+      {currentUser && (
+        <UserInfoContainer>
+          <PersonIcon
+            onClick={togglePersonDropdown}
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+            title="User menu"
+            style={{
+              background: currentUser.profilePicture ? 'transparent' : 'rgba(255, 255, 255, 0.2)',
+              padding: 0,
+              border: 'none'
+            }}
+          >
+            {currentUser.profilePicture ? (
+              <img 
+                src={`http://localhost:8080/api/auth/profile-pictures/${currentUser.profilePicture}`}
+                alt="Profile"
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'cover',
+                  borderRadius: '50%',
+                  border: '2px solid rgba(255, 255, 255, 0.3)'
+                }}
+              />
+            ) : (
+              <FaUser />
+            )}
+          </PersonIcon>
+          <AnimatePresence>
+            {showPersonDropdown && (
+              <PersonDropdown
+                initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                transition={{ duration: 0.2 }}
+              >
+                <DropdownItem onClick={handleHomeClick}>
+                  <FaHome /> Home
+                </DropdownItem>
+                <DropdownItem onClick={handleLogoutClick}>
+                  Logout
+                </DropdownItem>
+              </PersonDropdown>
+            )}
+          </AnimatePresence>
+        </UserInfoContainer>
+      )}
       <Header
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
-        <Title>
-          <FaHeart /> Add Photos to Our Gallery
-        </Title>
-        <div style={{ 
-          display: 'flex', 
-          gap: '10px',
-          flexWrap: 'wrap',
-          justifyContent: 'center'
-        }}>
-          <NavButton
-            onClick={() => navigate('/upload/music')}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-          >
-            <FaMusic /> Add Music
-          </NavButton>
-          <NavButton
-            onClick={() => navigate('/')}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-          >
-            <FaHome /> Home
-          </NavButton>
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          <Title>
+            <FaHeart /> Add Photos to Our Gallery
+          </Title>
+          <div style={{ 
+            display: 'flex', 
+            gap: '10px',
+            flexWrap: 'wrap',
+            justifyContent: 'center',
+            marginTop: '10px'
+          }}>
+            <NavButton
+              className="primary"
+              onClick={() => navigate('/upload/music')}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <FaMusic /> Add Music
+            </NavButton>
+          </div>
         </div>
       </Header>
 
@@ -640,8 +795,8 @@ const UploadPage = ({ currentUser, onLogout }) => {
         <UploadIcon>
           <FaCloudUploadAlt />
         </UploadIcon>
-        <UploadText>Drop your photos here or click to browse</UploadText>
-        <UploadSubtext>Supports JPEG, PNG, GIF, WebP (Max 10MB each)</UploadSubtext>
+        <UploadText>Drop photos here or click to browse</UploadText>
+        <UploadSubtext>JPEG, PNG, GIF, WebP • Max 20MB</UploadSubtext>
         <FileInput
           id="file-input"
           type="file"

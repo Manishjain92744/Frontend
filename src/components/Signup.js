@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
-import { FaHeart, FaEye, FaEyeSlash, FaUser, FaLock, FaEnvelope, FaUserCircle } from 'react-icons/fa';
+import { FaHeart, FaEye, FaEyeSlash, FaUser, FaLock, FaEnvelope, FaUserCircle, FaCamera, FaUpload } from 'react-icons/fa';
 import axios from 'axios';
 
 const SignupContainer = styled.div`
@@ -174,6 +174,102 @@ const PasswordStrength = styled.div`
   }};
 `;
 
+const ProfilePictureSection = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 20px;
+`;
+
+const ProfilePicturePreview = styled.div`
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  border: 3px solid #667eea;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: ${props => props.imageUrl ? `url(${props.imageUrl})` : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'};
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  
+  &:hover {
+    transform: scale(1.05);
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+  }
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.3);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  
+  &:hover::before {
+    opacity: 1;
+  }
+`;
+
+const ProfilePictureIcon = styled.div`
+  color: white;
+  font-size: 2rem;
+  z-index: 1;
+`;
+
+const ProfilePictureInput = styled.input`
+  display: none;
+`;
+
+const ProfilePictureLabel = styled.label`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  background: rgba(102, 126, 234, 0.1);
+  border: 2px dashed #667eea;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  color: #667eea;
+  font-weight: 500;
+  
+  &:hover {
+    background: rgba(102, 126, 234, 0.2);
+    transform: translateY(-2px);
+  }
+`;
+
+const ProfilePictureText = styled.span`
+  font-size: 0.9rem;
+`;
+
+const RemovePictureButton = styled.button`
+  background: #e74c3c;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  transition: all 0.3s ease;
+  
+  &:hover {
+    background: #c0392b;
+    transform: translateY(-1px);
+  }
+`;
+
 const Signup = ({ onSignupSuccess, onSwitchToLogin }) => {
   const [formData, setFormData] = useState({
     username: '',
@@ -187,6 +283,8 @@ const Signup = ({ onSignupSuccess, onSwitchToLogin }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [profilePicture, setProfilePicture] = useState(null);
+  const [profilePicturePreview, setProfilePicturePreview] = useState(null);
 
   const getPasswordStrength = (password) => {
     if (password.length === 0) return '';
@@ -201,6 +299,35 @@ const Signup = ({ onSignupSuccess, onSwitchToLogin }) => {
       [e.target.name]: e.target.value
     });
     setError('');
+  };
+
+  const handleProfilePictureChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        setError('Please select an image file');
+        return;
+      }
+      
+      // Validate file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        setError('File size must be less than 5MB');
+        return;
+      }
+      
+      setProfilePicture(file);
+      setProfilePicturePreview(URL.createObjectURL(file));
+      setError('');
+    }
+  };
+
+  const removeProfilePicture = () => {
+    setProfilePicture(null);
+    setProfilePicturePreview(null);
+    if (document.getElementById('profile-picture-input')) {
+      document.getElementById('profile-picture-input').value = '';
+    }
   };
 
   const validateForm = () => {
@@ -231,11 +358,35 @@ const Signup = ({ onSignupSuccess, onSwitchToLogin }) => {
     setSuccess('');
 
     try {
+      let profilePictureFileName = null;
+      
+      // Upload profile picture if selected
+      if (profilePicture) {
+        const uploadFormData = new FormData();
+        uploadFormData.append('file', profilePicture);
+        uploadFormData.append('username', formData.username);
+        
+        const uploadResponse = await axios.post('http://localhost:8080/api/auth/upload-profile-picture', uploadFormData, {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        });
+        
+        if (uploadResponse.data.success) {
+          profilePictureFileName = uploadResponse.data.fileName;
+        } else {
+          setError('Failed to upload profile picture');
+          setLoading(false);
+          return;
+        }
+      }
+
       const signupData = {
         username: formData.username,
         email: formData.email,
         password: formData.password,
-        fullName: formData.fullName
+        fullName: formData.fullName,
+        profilePicture: profilePictureFileName
       };
 
       const response = await axios.post('http://localhost:8080/api/auth/signup', signupData);
@@ -250,6 +401,8 @@ const Signup = ({ onSignupSuccess, onSwitchToLogin }) => {
           confirmPassword: '',
           fullName: ''
         });
+        setProfilePicture(null);
+        setProfilePicturePreview(null);
         // Call the parent callback
         if (onSignupSuccess) {
           onSignupSuccess(response.data.user);
@@ -280,6 +433,35 @@ const Signup = ({ onSignupSuccess, onSwitchToLogin }) => {
         
         <Title>Create Account</Title>
         <Subtitle>Join us and start sharing your memories</Subtitle>
+
+        <ProfilePictureSection>
+          <ProfilePicturePreview
+            imageUrl={profilePicturePreview}
+            onClick={() => document.getElementById('profile-picture-input').click()}
+          >
+            {!profilePicturePreview && <ProfilePictureIcon><FaCamera /></ProfilePictureIcon>}
+          </ProfilePicturePreview>
+          
+          <ProfilePictureInput
+            id="profile-picture-input"
+            type="file"
+            accept="image/*"
+            onChange={handleProfilePictureChange}
+          />
+          
+          <ProfilePictureLabel htmlFor="profile-picture-input">
+            <FaUpload />
+            <ProfilePictureText>
+              {profilePicture ? 'Change Profile Picture' : 'Upload Profile Picture'}
+            </ProfilePictureText>
+          </ProfilePictureLabel>
+          
+          {profilePicture && (
+            <RemovePictureButton onClick={removeProfilePicture}>
+              Remove Picture
+            </RemovePictureButton>
+          )}
+        </ProfilePictureSection>
 
         <Form onSubmit={handleSubmit}>
           {error && (

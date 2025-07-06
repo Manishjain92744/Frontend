@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
 import { FaHeart, FaHome, FaUser } from 'react-icons/fa';
+import axios from 'axios';
 
 const MessageContainer = styled.div`
   min-height: 100vh;
@@ -231,6 +232,85 @@ const LogoutButton = styled.button`
   }
 `;
 
+const MessageDisplay = styled(motion.div)`
+  background: linear-gradient(135deg, rgba(255, 182, 193, 0.25) 0%, rgba(186, 104, 200, 0.25) 100%);
+  backdrop-filter: blur(18px) saturate(120%);
+  border: 2.5px solid rgba(255, 255, 255, 0.35);
+  border-radius: 32px;
+  padding: 48px 36px;
+  margin: 32px 0 32px 0;
+  color: #fff;
+  font-size: 1.7rem;
+  line-height: 1.7;
+  text-align: center;
+  max-width: 700px;
+  box-shadow: 0 8px 40px 0 rgba(255, 107, 170, 0.18), 0 2px 32px 0 rgba(186, 104, 200, 0.12);
+  font-family: 'Pacifico', 'Caveat', cursive, sans-serif;
+  letter-spacing: 1.2px;
+  position: relative;
+  overflow: visible;
+  animation: floatBox 6s ease-in-out infinite;
+
+  @keyframes floatBox {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+    100% { transform: translateY(0px); }
+  }
+
+  &::before, &::after {
+    content: '💖';
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 2.2rem;
+    opacity: 0.7;
+    filter: blur(0.5px);
+    pointer-events: none;
+    animation: heartFloat 4s ease-in-out infinite;
+  }
+  &::before {
+    top: -2.2rem;
+    animation-delay: 0s;
+  }
+  &::after {
+    bottom: -2.2rem;
+    animation-delay: 2s;
+  }
+
+  @keyframes heartFloat {
+    0% { opacity: 0.7; transform: translateX(-50%) scale(1); }
+    50% { opacity: 1; transform: translateX(-50%) scale(1.15); }
+    100% { opacity: 0.7; transform: translateX(-50%) scale(1); }
+  }
+
+  @media (max-width: 768px) {
+    font-size: 1.2rem;
+    padding: 32px 16px;
+    border-radius: 22px;
+  }
+  
+  @media (max-width: 480px) {
+    font-size: 1.05rem;
+    padding: 18px 6px;
+    border-radius: 14px;
+  }
+`;
+
+const LoadingText = styled.div`
+  color: white;
+  font-size: 1.2rem;
+  text-align: center;
+  margin: 20px 0;
+`;
+
+const ErrorText = styled.div`
+  color: #ff6b6b;
+  font-size: 1.1rem;
+  text-align: center;
+  margin: 20px 0;
+  font-style: italic;
+`;
+
 const FooterMessage = styled.div`
   position: fixed;
   left: 0;
@@ -265,6 +345,9 @@ const FooterMessage = styled.div`
 
 const MessagePage = ({ currentUser, onLogout }) => {
   const navigate = useNavigate();
+  const [message, setMessage] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   const generateHearts = () => {
     const hearts = [];
@@ -279,6 +362,24 @@ const MessagePage = ({ currentUser, onLogout }) => {
     }
     return hearts;
   };
+
+  useEffect(() => {
+    const fetchMessage = async () => {
+      try {
+        setLoading(true);
+        const response = await axios.get('http://localhost:8080/api/messages/latest');
+        setMessage(response.data);
+        setError(null);
+      } catch (error) {
+        console.error('Error fetching message:', error);
+        setError('No message found');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchMessage();
+  }, []);
 
   return (
     <MessageContainer>
@@ -334,13 +435,39 @@ const MessagePage = ({ currentUser, onLogout }) => {
           Special Message for you Sunshine ✨
         </Title>
         
-        <Subtitle
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1, delay: 0.4 }}
-        >
-          This space is reserved for something very special... 💝
-        </Subtitle>
+        {loading ? (
+          <LoadingText
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1, delay: 0.4 }}
+          >
+            Loading your special message... 💕
+          </LoadingText>
+        ) : error ? (
+          <ErrorText
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1, delay: 0.4 }}
+          >
+            {error}
+          </ErrorText>
+        ) : message ? (
+          <MessageDisplay
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1, delay: 0.4 }}
+          >
+            {message.content}
+          </MessageDisplay>
+        ) : (
+          <Subtitle
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1, delay: 0.4 }}
+          >
+            This space is reserved for something very special... 💝
+          </Subtitle>
+        )}
         
         <ButtonContainer
           initial={{ opacity: 0, y: 30 }}

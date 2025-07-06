@@ -101,6 +101,76 @@ const NavButton = styled(motion.button)`
   }
 `;
 
+const UserInfoContainer = styled.div`
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  z-index: 10;
+  
+  @media (max-width: 768px) {
+    top: 15px;
+    right: 15px;
+    gap: 10px;
+  }
+  
+  @media (max-width: 480px) {
+    top: 10px;
+    right: 10px;
+    gap: 8px;
+  }
+`;
+
+const UserInfo = styled.div`
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 25px;
+  padding: 8px 16px;
+  color: white;
+  font-size: 0.9rem;
+  font-weight: 500;
+  
+  @media (max-width: 768px) {
+    font-size: 0.8rem;
+    padding: 6px 12px;
+  }
+  
+  @media (max-width: 480px) {
+    font-size: 0.75rem;
+    padding: 5px 10px;
+  }
+`;
+
+const LogoutButton = styled.button`
+  background: rgba(255, 107, 107, 0.8);
+  border: none;
+  border-radius: 20px;
+  padding: 8px 16px;
+  color: white;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  
+  &:hover {
+    background: rgba(255, 107, 107, 1);
+    transform: translateY(-1px);
+  }
+  
+  @media (max-width: 768px) {
+    font-size: 0.8rem;
+    padding: 6px 12px;
+  }
+  
+  @media (max-width: 480px) {
+    font-size: 0.75rem;
+    padding: 5px 10px;
+  }
+`;
+
 const UploadArea = styled(motion.div)`
   width: 100%;
   max-width: 800px;
@@ -312,7 +382,7 @@ const ErrorMessage = styled(motion.div)`
   }
 `;
 
-const UploadPage = () => {
+const UploadPage = ({ currentUser, onLogout }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const [isDragOver, setIsDragOver] = useState(false);
@@ -428,6 +498,17 @@ const UploadPage = () => {
 
   return (
     <UploadContainer>
+      {currentUser && (
+        <UserInfoContainer>
+          <UserInfo>
+            Welcome, {currentUser.username}!
+          </UserInfo>
+          <LogoutButton onClick={onLogout}>
+            Logout
+          </LogoutButton>
+        </UserInfoContainer>
+      )}
+      
       <Header
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -491,7 +572,7 @@ const UploadPage = () => {
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.3 }}
             >
-              <ProgressIcon status={upload.status}>
+              <ProgressIcon $status={upload.status}>
                 {getStatusIcon(upload.status)}
               </ProgressIcon>
               <ProgressInfo>

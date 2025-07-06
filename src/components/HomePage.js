@@ -174,6 +174,30 @@ const MusicControlsContainer = styled.div`
   top: 20px;
   right: 20px;
   display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+  z-index: 10;
+  
+  @media (max-width: 768px) {
+    top: 15px;
+    right: 15px;
+    gap: 8px;
+  }
+  
+  @media (max-width: 480px) {
+    top: 10px;
+    right: 10px;
+    gap: 6px;
+    flex-direction: column;
+  }
+`;
+
+const MusicLogoutContainer = styled.div`
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  display: flex;
   flex-direction: column;
   gap: 10px;
   z-index: 10;
@@ -230,36 +254,33 @@ const MusicSelector = styled.select`
 `;
 
 const MusicControl = styled(motion.button)`
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  border: none;
   background: rgba(255, 255, 255, 0.2);
-  backdrop-filter: blur(10px);
+  border: none;
+  border-radius: 20px;
+  padding: 8px 16px;
   color: white;
-  font-size: 1.2rem;
+  font-size: 0.9rem;
+  font-weight: 500;
   cursor: pointer;
   display: flex;
   align-items: center;
-  justify-content: center;
+  gap: 8px;
   transition: all 0.3s ease;
-  align-self: center;
+  white-space: nowrap;
   
   &:hover {
     background: rgba(255, 255, 255, 0.3);
-    transform: scale(1.1);
+    transform: translateY(-1px);
   }
   
   @media (max-width: 768px) {
-    width: 45px;
-    height: 45px;
-    font-size: 1.1rem;
+    font-size: 0.8rem;
+    padding: 6px 12px;
   }
   
   @media (max-width: 480px) {
-    width: 40px;
-    height: 40px;
-    font-size: 1rem;
+    font-size: 0.75rem;
+    padding: 5px 10px;
   }
 `;
 
@@ -280,7 +301,77 @@ const HeartIcon = styled(motion.div)`
   }
 `;
 
-const HomePage = () => {
+const UserInfoContainer = styled.div`
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  z-index: 10;
+  
+  @media (max-width: 768px) {
+    top: 15px;
+    left: 15px;
+    gap: 10px;
+  }
+  
+  @media (max-width: 480px) {
+    top: 10px;
+    left: 10px;
+    gap: 8px;
+  }
+`;
+
+const UserInfo = styled.div`
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 25px;
+  padding: 8px 16px;
+  color: white;
+  font-size: 0.9rem;
+  font-weight: 500;
+  
+  @media (max-width: 768px) {
+    font-size: 0.8rem;
+    padding: 6px 12px;
+  }
+  
+  @media (max-width: 480px) {
+    font-size: 0.75rem;
+    padding: 5px 10px;
+  }
+`;
+
+const LogoutButton = styled.button`
+  background: rgba(255, 107, 107, 0.8);
+  border: none;
+  border-radius: 20px;
+  padding: 8px 16px;
+  color: white;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  
+  &:hover {
+    background: rgba(255, 107, 107, 1);
+    transform: translateY(-1px);
+  }
+  
+  @media (max-width: 768px) {
+    font-size: 0.8rem;
+    padding: 6px 12px;
+  }
+  
+  @media (max-width: 480px) {
+    font-size: 0.75rem;
+    padding: 5px 10px;
+  }
+`;
+
+const HomePage = ({ currentUser, onLogout }) => {
   const navigate = useNavigate();
   const { isPlaying, musicFiles, currentMusic, toggleMusic, changeMusic } = useAudio();
 
@@ -326,6 +417,14 @@ const HomePage = () => {
         ))}
       </FloatingHearts>
 
+      {currentUser && (
+        <UserInfoContainer>
+          <UserInfo>
+            Welcome, {currentUser.username}!
+          </UserInfo>
+        </UserInfoContainer>
+      )}
+      
       <MusicControlsContainer>
         {musicFiles.length > 0 && isPlaying && (
           <MusicSelector
@@ -343,11 +442,17 @@ const HomePage = () => {
         )}
         <MusicControl
           onClick={toggleMusic}
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.9 }}
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
         >
           {isPlaying ? <FaPause /> : <FaPlay />}
+          {isPlaying ? 'Pause' : 'Play'}
         </MusicControl>
+        {currentUser && (
+          <LogoutButton onClick={onLogout}>
+            Logout
+          </LogoutButton>
+        )}
       </MusicControlsContainer>
 
       <Content>

@@ -171,6 +171,93 @@ const MusicControl = styled(motion.button)`
   }
 `;
 
+const UserInfo = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(255, 255, 255, 0.15);
+  padding: 8px 16px;
+  border-radius: 25px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  
+  @media (max-width: 768px) {
+    flex-direction: column;
+    gap: 8px;
+    padding: 12px;
+  }
+`;
+
+const UserAvatar = styled.div`
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 1rem;
+  
+  @media (max-width: 768px) {
+    width: 32px;
+    height: 32px;
+    font-size: 0.9rem;
+  }
+`;
+
+const UserDetails = styled.div`
+  display: flex;
+  flex-direction: column;
+  
+  @media (max-width: 768px) {
+    align-items: center;
+    text-align: center;
+  }
+`;
+
+const UserName = styled.span`
+  color: white;
+  font-weight: 600;
+  font-size: 0.9rem;
+  
+  @media (max-width: 768px) {
+    font-size: 0.8rem;
+  }
+`;
+
+const UserEmail = styled.span`
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.8rem;
+  
+  @media (max-width: 768px) {
+    font-size: 0.7rem;
+  }
+`;
+
+const LogoutButton = styled.button`
+  background: rgba(231, 76, 60, 0.8);
+  border: none;
+  color: white;
+  padding: 6px 12px;
+  border-radius: 15px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  
+  &:hover {
+    background: #e74c3c;
+    transform: translateY(-1px);
+  }
+  
+  @media (max-width: 768px) {
+    padding: 8px 16px;
+    font-size: 0.9rem;
+  }
+`;
+
 
 
 const GalleryGrid = styled(motion.div)`
@@ -464,7 +551,7 @@ const FooterMessage = styled.div`
   }
 `;
 
-const Gallery = () => {
+const Gallery = ({ currentUser, onLogout }) => {
   const navigate = useNavigate();
   const { isPlaying, toggleMusic } = useAudio();
   const [images, setImages] = useState([]);
@@ -607,6 +694,20 @@ const Gallery = () => {
             <FaHeart /> Our Photo Gallery
           </Title>
           <HeaderControls>
+            {currentUser && (
+              <UserInfo>
+                <UserAvatar>
+                  {currentUser.fullName ? currentUser.fullName.charAt(0).toUpperCase() : currentUser.username.charAt(0).toUpperCase()}
+                </UserAvatar>
+                <UserDetails>
+                  <UserName>{currentUser.fullName || currentUser.username}</UserName>
+                  <UserEmail>{currentUser.email}</UserEmail>
+                </UserDetails>
+                <LogoutButton onClick={onLogout}>
+                  Logout
+                </LogoutButton>
+              </UserInfo>
+            )}
             <MusicControl
               onClick={toggleMusic}
               whileHover={{ scale: 1.1 }}

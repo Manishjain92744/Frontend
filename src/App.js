@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
+import AuthWrapper from './components/AuthWrapper';
 import HomePage from './components/HomePage';
 import Gallery from './components/Gallery';
 import UploadPage from './components/UploadPage';
@@ -26,10 +27,10 @@ function App() {
           transition={{ duration: 1 }}
         >
           <Routes>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/gallery" element={<Gallery />} />
-            <Route path="/upload" element={<UploadPage />} />
-            <Route path="/upload/music" element={<MusicUploadPage />} />
+            <Route path="/" element={<AuthWrapper />} />
+            <Route path="/gallery" element={<AuthWrapper />} />
+            <Route path="/upload" element={<AuthWrapper />} />
+            <Route path="/upload/music" element={<AuthWrapper />} />
           </Routes>
         </AppContainer>
       </Router>

@@ -963,7 +963,6 @@ const Gallery = ({ currentUser, onLogout }) => {
                       transition={{ duration: 0.2 }}
                     >
                       <DropdownItem onClick={handleHomeClick}>
-                        <FaHome />
                         Home
                       </DropdownItem>
                       <DropdownItem onClick={handleLogoutClick}>

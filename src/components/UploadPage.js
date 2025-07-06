@@ -745,7 +745,7 @@ const UploadPage = ({ currentUser, onLogout }) => {
                 transition={{ duration: 0.2 }}
               >
                 <DropdownItem onClick={handleHomeClick}>
-                  <FaHome /> Home
+                  Home
                 </DropdownItem>
                 <DropdownItem onClick={handleLogoutClick}>
                   Logout

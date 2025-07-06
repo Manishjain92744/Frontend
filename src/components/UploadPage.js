@@ -12,6 +12,7 @@ const UploadContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
+  position: relative;
   
   @media (max-width: 768px) {
     padding: 15px 10px;
@@ -20,6 +21,23 @@ const UploadContainer = styled.div`
   @media (max-width: 480px) {
     padding: 10px 8px;
   }
+`;
+
+const FloatingHearts = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 2;
+  pointer-events: none;
+`;
+
+const Heart = styled(motion.div)`
+  position: absolute;
+  color: rgba(255, 255, 255, 0.3);
+  font-size: ${props => props.size}px;
+  animation: float 6s ease-in-out infinite;
 `;
 
 const Header = styled(motion.div)`
@@ -422,6 +440,20 @@ const UploadPage = ({ currentUser, onLogout }) => {
   const [isUploading, setIsUploading] = useState(false);
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
 
+  const generateHearts = () => {
+    const hearts = [];
+    for (let i = 0; i < 40; i++) {
+      hearts.push({
+        id: i,
+        x: Math.random() * 100,
+        y: Math.random() * 100,
+        size: Math.random() * 20 + 10,
+        delay: Math.random() * 2
+      });
+    }
+    return hearts;
+  };
+
   const handleDragOver = useCallback((e) => {
     e.preventDefault();
     setIsDragOver(true);
@@ -530,6 +562,30 @@ const UploadPage = ({ currentUser, onLogout }) => {
 
   return (
     <UploadContainer>
+      <FloatingHearts>
+        {generateHearts().map(heart => (
+          <Heart
+            key={heart.id}
+            size={heart.size}
+            style={{
+              left: `${heart.x}%`,
+              top: `${heart.y}%`,
+            }}
+            animate={{
+              y: [-10, 10, -10],
+              opacity: [0.3, 0.7, 0.3],
+            }}
+            transition={{
+              duration: 6,
+              repeat: Infinity,
+              delay: heart.delay,
+            }}
+          >
+            ❤️
+          </Heart>
+        ))}
+      </FloatingHearts>
+      
       {currentUser && (
         <UserInfoContainer>
           <UserInfo>

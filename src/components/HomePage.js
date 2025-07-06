@@ -483,7 +483,7 @@ const HomePage = ({ currentUser, onLogout }) => {
 
   const generateHearts = () => {
     const hearts = [];
-    for (let i = 0; i < 20; i++) {
+    for (let i = 0; i < 40; i++) {
       hearts.push({
         id: i,
         x: Math.random() * 100,

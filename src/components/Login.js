@@ -11,6 +11,24 @@ const LoginContainer = styled.div`
   justify-content: center;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   padding: 20px;
+  position: relative;
+`;
+
+const FloatingHearts = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 2;
+  pointer-events: none;
+`;
+
+const Heart = styled(motion.div)`
+  position: absolute;
+  color: rgba(255, 255, 255, 0.3);
+  font-size: ${props => props.size}px;
+  animation: float 6s ease-in-out infinite;
 `;
 
 const LoginCard = styled(motion.div)`
@@ -205,6 +223,20 @@ const Login = ({ onLoginSuccess, onSwitchToSignup }) => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
+  const generateHearts = () => {
+    const hearts = [];
+    for (let i = 0; i < 40; i++) {
+      hearts.push({
+        id: i,
+        x: Math.random() * 100,
+        y: Math.random() * 100,
+        size: Math.random() * 20 + 10,
+        delay: Math.random() * 2
+      });
+    }
+    return hearts;
+  };
+
   const handleChange = (e) => {
     setFormData({
       ...formData,
@@ -242,6 +274,30 @@ const Login = ({ onLoginSuccess, onSwitchToSignup }) => {
 
   return (
     <LoginContainer>
+      <FloatingHearts>
+        {generateHearts().map(heart => (
+          <Heart
+            key={heart.id}
+            size={heart.size}
+            style={{
+              left: `${heart.x}%`,
+              top: `${heart.y}%`,
+            }}
+            animate={{
+              y: [-10, 10, -10],
+              opacity: [0.3, 0.7, 0.3],
+            }}
+            transition={{
+              duration: 6,
+              repeat: Infinity,
+              delay: heart.delay,
+            }}
+          >
+            ❤️
+          </Heart>
+        ))}
+      </FloatingHearts>
+      
       <LoginCard
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}

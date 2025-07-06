@@ -26,6 +26,23 @@ const GalleryContainer = styled.div`
   }
 `;
 
+const FloatingHearts = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 2;
+  pointer-events: none;
+`;
+
+const Heart = styled(motion.div)`
+  position: absolute;
+  color: rgba(255, 255, 255, 0.3);
+  font-size: ${props => props.size}px;
+  animation: float 6s ease-in-out infinite;
+`;
+
 const Header = styled(motion.div)`
   display: flex;
   justify-content: space-between;
@@ -666,6 +683,20 @@ const Gallery = ({ currentUser, onLogout }) => {
   const [deleteSuccess, setDeleteSuccess] = useState(false);
   const [showPersonDropdown, setShowPersonDropdown] = useState(false);
 
+  const generateHearts = () => {
+    const hearts = [];
+    for (let i = 0; i < 40; i++) {
+      hearts.push({
+        id: i,
+        x: Math.random() * 100,
+        y: Math.random() * 100,
+        size: Math.random() * 20 + 10,
+        delay: Math.random() * 2
+      });
+    }
+    return hearts;
+  };
+
   useEffect(() => {
     fetchImages();
   }, []);
@@ -805,6 +836,30 @@ const Gallery = ({ currentUser, onLogout }) => {
   return (
     <>
       <GalleryContainer>
+        <FloatingHearts>
+          {generateHearts().map(heart => (
+            <Heart
+              key={heart.id}
+              size={heart.size}
+              style={{
+                left: `${heart.x}%`,
+                top: `${heart.y}%`,
+              }}
+              animate={{
+                y: [-10, 10, -10],
+                opacity: [0.3, 0.7, 0.3],
+              }}
+              transition={{
+                duration: 6,
+                repeat: Infinity,
+                delay: heart.delay,
+              }}
+            >
+              ❤️
+            </Heart>
+          ))}
+        </FloatingHearts>
+        
         <Header
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}

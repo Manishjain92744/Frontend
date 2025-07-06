@@ -343,6 +343,22 @@ const UserInfoContainer = styled.div`
   position: relative;
 `;
 
+const WelcomeMessage = styled.div`
+  color: white;
+  font-size: 0.9rem;
+  font-weight: 500;
+  text-align: center;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+  
+  @media (max-width: 768px) {
+    font-size: 0.8rem;
+  }
+  
+  @media (max-width: 480px) {
+    font-size: 0.75rem;
+  }
+`;
+
 const GalleryGrid = styled(motion.div)`
   display: flex;
   flex-direction: column;
@@ -795,6 +811,7 @@ const Gallery = ({ currentUser, onLogout }) => {
             <FaHeart /> Our Photo Gallery
           </Title>
           <HeaderControls>
+            <WelcomeMessage>Welcome, {currentUser.username}</WelcomeMessage>
             <MusicControl
               onClick={toggleMusic}
               whileHover={{ scale: 1.1 }}

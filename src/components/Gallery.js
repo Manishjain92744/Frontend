@@ -344,7 +344,7 @@ const UserInfoContainer = styled.div`
 `;
 
 const WelcomeMessage = styled.div`
-  color: #fff;
+  color: #fefefe;
   font-size: 1rem;
   font-weight: 600;
   text-align: center;
@@ -354,7 +354,7 @@ const WelcomeMessage = styled.div`
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.3);
   box-shadow: 0 4px 15px rgba(255, 107, 157, 0.4);
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
   
   @media (max-width: 768px) {
     font-size: 0.9rem;
@@ -816,7 +816,7 @@ const Gallery = ({ currentUser, onLogout }) => {
           transition={{ duration: 0.5 }}
         >
           <Title>
-            <FaHeart /> Our Photo Gallery
+            Our Story in Pictures 💕
           </Title>
           <HeaderControls>
             <WelcomeMessage>Welcome, {currentUser.username}!</WelcomeMessage>

@@ -819,7 +819,7 @@ const Gallery = ({ currentUser, onLogout }) => {
             <FaHeart /> Our Photo Gallery
           </Title>
           <HeaderControls>
-            <WelcomeMessage>Welcome, {currentUser.username}</WelcomeMessage>
+            <WelcomeMessage>Welcome, {currentUser.username}!</WelcomeMessage>
             <MusicControl
               onClick={toggleMusic}
               whileHover={{ scale: 1.1 }}

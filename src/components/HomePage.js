@@ -371,6 +371,30 @@ const LogoutButton = styled.button`
   }
 `;
 
+const WelcomeMessage = styled.div`
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 600;
+  text-align: center;
+  padding: 8px 16px;
+  border-radius: 20px;
+  background: linear-gradient(135deg, rgba(255, 107, 157, 0.9) 0%, rgba(196, 69, 105, 0.9) 50%, rgba(255, 142, 142, 0.9) 100%);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 4px 15px rgba(255, 107, 157, 0.4);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  
+  @media (max-width: 768px) {
+    font-size: 0.9rem;
+    padding: 6px 12px;
+  }
+  
+  @media (max-width: 480px) {
+    font-size: 0.85rem;
+    padding: 5px 10px;
+  }
+`;
+
 const HomePage = ({ currentUser, onLogout }) => {
   const navigate = useNavigate();
   const { isPlaying, musicFiles, currentMusic, toggleMusic, changeMusic } = useAudio();
@@ -419,9 +443,9 @@ const HomePage = ({ currentUser, onLogout }) => {
 
       {currentUser && (
         <UserInfoContainer>
-          <UserInfo>
+          <WelcomeMessage>
             Welcome, {currentUser.username}!
-          </UserInfo>
+          </WelcomeMessage>
         </UserInfoContainer>
       )}
       

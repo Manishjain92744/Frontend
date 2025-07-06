@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaHeart, FaTimes, FaChevronLeft, FaChevronRight, FaHome, FaPlay, FaPause, FaSync, FaMusic, FaTrash, FaEllipsisV } from 'react-icons/fa';
+import { FaHeart, FaTimes, FaChevronLeft, FaChevronRight, FaHome, FaPlay, FaPause, FaSync, FaMusic, FaTrash, FaEllipsisV, FaUser } from 'react-icons/fa';
 import axios from 'axios';
 import PhotoInteractions from './PhotoInteractions';
 import { useAudio } from '../contexts/AudioContext';
@@ -258,7 +258,82 @@ const LogoutButton = styled.button`
   }
 `;
 
+const PersonIcon = styled(motion.button)`
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  color: white;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  position: relative;
+  
+  &:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: scale(1.1);
+  }
+  
+  @media (max-width: 480px) {
+    width: 48px;
+    height: 48px;
+    font-size: 1.1rem;
+  }
+`;
 
+const PersonDropdown = styled(motion.div)`
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 8px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+  min-width: 150px;
+  z-index: 1001;
+  
+  @media (max-width: 480px) {
+    min-width: 140px;
+  }
+`;
+
+const DropdownItem = styled.button`
+  width: 100%;
+  padding: 12px 16px;
+  border: none;
+  background: transparent;
+  color: #333;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: all 0.2s ease;
+  
+  &:hover {
+    background: rgba(102, 126, 234, 0.1);
+    color: #667eea;
+  }
+  
+  &:first-child {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  }
+  
+  @media (max-width: 480px) {
+    padding: 14px 16px;
+    font-size: 1rem;
+  }
+`;
+
+const UserInfoContainer = styled.div`
+  position: relative;
+`;
 
 const GalleryGrid = styled(motion.div)`
   display: flex;
@@ -562,6 +637,7 @@ const Gallery = ({ currentUser, onLogout }) => {
   const [deleting, setDeleting] = useState(false);
   const [openMenu, setOpenMenu] = useState(null);
   const [deleteSuccess, setDeleteSuccess] = useState(false);
+  const [showPersonDropdown, setShowPersonDropdown] = useState(false);
 
   useEffect(() => {
     fetchImages();
@@ -625,13 +701,14 @@ const Gallery = ({ currentUser, onLogout }) => {
   useEffect(() => {
     const handleClickOutside = () => {
       setOpenMenu(null);
+      setShowPersonDropdown(false);
     };
 
-    if (openMenu) {
+    if (openMenu || showPersonDropdown) {
       document.addEventListener('click', handleClickOutside);
       return () => document.removeEventListener('click', handleClickOutside);
     }
-  }, [openMenu]);
+  }, [openMenu, showPersonDropdown]);
 
   const handleDeletePhoto = async (image) => {
     if (!window.confirm('Are you sure you want to delete this photo?')) return;
@@ -661,6 +738,22 @@ const Gallery = ({ currentUser, onLogout }) => {
 
   const closeMenu = () => {
     setOpenMenu(null);
+  };
+
+  const togglePersonDropdown = (e) => {
+    e.stopPropagation();
+    setShowPersonDropdown(!showPersonDropdown);
+  };
+
+  const handleHomeClick = () => {
+    setShowPersonDropdown(false);
+    fetchImages();
+    navigate('/');
+  };
+
+  const handleLogoutClick = () => {
+    setShowPersonDropdown(false);
+    onLogout();
   };
 
   if (loading) {
@@ -694,20 +787,6 @@ const Gallery = ({ currentUser, onLogout }) => {
             <FaHeart /> Our Photo Gallery
           </Title>
           <HeaderControls>
-            {currentUser && (
-              <UserInfo>
-                <UserAvatar>
-                  {currentUser.fullName ? currentUser.fullName.charAt(0).toUpperCase() : currentUser.username.charAt(0).toUpperCase()}
-                </UserAvatar>
-                <UserDetails>
-                  <UserName>{currentUser.fullName || currentUser.username}</UserName>
-                  <UserEmail>{currentUser.email}</UserEmail>
-                </UserDetails>
-                <LogoutButton onClick={onLogout}>
-                  Logout
-                </LogoutButton>
-              </UserInfo>
-            )}
             <MusicControl
               onClick={toggleMusic}
               whileHover={{ scale: 1.1 }}
@@ -716,22 +795,36 @@ const Gallery = ({ currentUser, onLogout }) => {
             >
               {isPlaying ? <FaPause /> : <FaPlay />}
             </MusicControl>
-            <NavButton
-              onClick={() => {
-                fetchImages();
-                navigate('/');
-              }}
-              disabled={isRefreshing}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              <FaHome />
-              {isRefreshing ? (
-                <FaSync style={{ animation: 'spin 1s linear infinite' }} />
-              ) : (
-                'Home'
-              )}
-            </NavButton>
+            {currentUser && (
+              <UserInfoContainer>
+                <PersonIcon
+                  onClick={togglePersonDropdown}
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                  title="User menu"
+                >
+                  <FaUser />
+                </PersonIcon>
+                <AnimatePresence>
+                  {showPersonDropdown && (
+                    <PersonDropdown
+                      initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <DropdownItem onClick={handleHomeClick}>
+                        <FaHome />
+                        Home
+                      </DropdownItem>
+                      <DropdownItem onClick={handleLogoutClick}>
+                        Logout
+                      </DropdownItem>
+                    </PersonDropdown>
+                  )}
+                </AnimatePresence>
+              </UserInfoContainer>
+            )}
           </HeaderControls>
         </Header>
 

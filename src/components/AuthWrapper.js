@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import styled from 'styled-components';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useAudio } from '../contexts/AudioContext';
 import Login from './Login';
 import Signup from './Signup';
 import HomePage from './HomePage';
@@ -18,6 +19,7 @@ const AuthWrapper = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
   const [showLogin, setShowLogin] = useState(true);
+  const { stopMusic } = useAudio();
 
   useEffect(() => {
     // Check if user is already logged in
@@ -44,6 +46,7 @@ const AuthWrapper = () => {
   };
 
   const handleLogout = () => {
+    stopMusic(); // Stop the music when user logs out
     localStorage.removeItem('user');
     setCurrentUser(null);
     setIsAuthenticated(false);

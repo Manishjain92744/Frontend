@@ -27,6 +27,7 @@ export const AudioProvider = ({ children }) => {
     return () => {
       audio.pause();
       audio.currentTime = 0;
+      setIsPlaying(false);
     };
   }, []);
 
@@ -80,12 +81,20 @@ export const AudioProvider = ({ children }) => {
     }
   };
 
+  const stopMusic = () => {
+    const audio = audioRef.current;
+    audio.pause();
+    audio.currentTime = 0;
+    setIsPlaying(false);
+  };
+
   const value = {
     isPlaying,
     musicFiles,
     currentMusic,
     toggleMusic,
     changeMusic,
+    stopMusic,
     fetchMusicFiles
   };
 

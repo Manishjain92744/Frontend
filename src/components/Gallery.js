@@ -638,34 +638,58 @@ const MenuItem = styled.button`
   }
 `;
 
+const MessageButton = styled(motion.button)`
+  background: linear-gradient(135deg, #ff6b6b, #ff8e8e);
+  color: white;
+  border: none;
+  padding: 15px 30px;
+  border-radius: 50px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 8px 25px rgba(255, 107, 107, 0.3);
+  transition: all 0.3s ease;
+  font-family: 'Pacifico', cursive;
+  letter-spacing: 1px;
+  
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 35px rgba(255, 107, 107, 0.4);
+  }
+  
+  @media (max-width: 768px) {
+    padding: 12px 24px;
+    font-size: 1rem;
+  }
+  
+  @media (max-width: 480px) {
+    padding: 10px 20px;
+    font-size: 0.9rem;
+  }
+`;
+
 const FooterMessage = styled.div`
-  position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 0;
   color: white;
   font-family: 'Pacifico', cursive;
   font-size: 1.2rem;
   text-align: center;
-  padding: 12px 0 16px 0;
-  z-index: 9999;
+  padding: 20px 0;
   letter-spacing: 1.5px;
   text-shadow: 
     0 0 20px rgba(255, 255, 255, 1),
     0 2px 10px rgba(0, 0, 0, 0.5),
     0 0 40px rgba(255, 255, 255, 0.8);
-  pointer-events: none;
   user-select: none;
 
   @media (max-width: 768px) {
     font-size: 1.1rem;
-    padding: 10px 0 14px 0;
+    padding: 16px 0;
     letter-spacing: 1.2px;
   }
   
   @media (max-width: 480px) {
     font-size: 1rem;
-    padding: 8px 0 12px 0;
+    padding: 12px 0;
     letter-spacing: 1px;
   }
 `;
@@ -685,13 +709,36 @@ const Gallery = ({ currentUser, onLogout }) => {
 
   const generateHearts = () => {
     const hearts = [];
-    for (let i = 0; i < 40; i++) {
+    const numHearts = 60; // Increased from 40 to 60
+    
+    // Create a more structured distribution with some randomness
+    for (let i = 0; i < numHearts; i++) {
+      let x, y;
+      
+      // Use a mix of grid-based and random positioning for better distribution
+      if (i < numHearts * 0.7) {
+        // 70% of hearts use grid-based positioning with some randomness
+        const gridSize = 8; // 8x8 grid
+        const gridX = (i % gridSize) * (100 / gridSize);
+        const gridY = Math.floor(i / gridSize) * (100 / gridSize);
+        x = gridX + (Math.random() - 0.5) * 15; // Add some randomness to grid positions
+        y = gridY + (Math.random() - 0.5) * 15;
+      } else {
+        // 30% of hearts use completely random positioning
+        x = Math.random() * 100;
+        y = Math.random() * 100;
+      }
+      
+      // Ensure hearts stay within bounds
+      x = Math.max(5, Math.min(95, x));
+      y = Math.max(5, Math.min(95, y));
+      
       hearts.push({
         id: i,
-        x: Math.random() * 100,
-        y: Math.random() * 100,
+        x: x,
+        y: y,
         size: Math.random() * 20 + 10,
-        delay: Math.random() * 2
+        delay: Math.random() * 3 // Increased delay range for more varied animation
       });
     }
     return hearts;
@@ -1067,6 +1114,16 @@ const Gallery = ({ currentUser, onLogout }) => {
           )}
         </AnimatePresence>
       </GalleryContainer>
+      
+      <MessageButton
+        onClick={() => navigate('/message')}
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
+        style={{ margin: '10px auto', display: 'block' }}
+      >
+        💕 Some Message for You My Love 💕
+      </MessageButton>
+      
       <FooterMessage>
         Made with ❤️ by the one who loves you the most
       </FooterMessage>

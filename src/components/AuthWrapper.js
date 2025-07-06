@@ -9,6 +9,7 @@ import HomePage from './HomePage';
 import Gallery from './Gallery';
 import UploadPage from './UploadPage';
 import MusicUploadPage from './MusicUploadPage';
+import MessagePage from './MessagePage';
 
 const AuthWrapperContainer = styled.div`
   min-height: 100vh;
@@ -80,6 +81,12 @@ const AuthWrapper = () => {
         return (
           <AuthWrapperContainer>
             <MusicUploadPage currentUser={currentUser} onLogout={handleLogout} />
+          </AuthWrapperContainer>
+        );
+      case '/message':
+        return (
+          <AuthWrapperContainer>
+            <MessagePage currentUser={currentUser} onLogout={handleLogout} />
           </AuthWrapperContainer>
         );
       default:

@@ -7,6 +7,7 @@ import HomePage from './components/HomePage';
 import Gallery from './components/Gallery';
 import UploadPage from './components/UploadPage';
 import MusicUploadPage from './components/MusicUploadPage';
+import MessagePage from './components/MessagePage';
 import GlobalStyle from './styles/GlobalStyle';
 import { AudioProvider } from './contexts/AudioContext';
 
@@ -31,6 +32,7 @@ function App() {
             <Route path="/gallery" element={<AuthWrapper />} />
             <Route path="/upload" element={<AuthWrapper />} />
             <Route path="/upload/music" element={<AuthWrapper />} />
+            <Route path="/message" element={<AuthWrapper />} />
           </Routes>
         </AppContainer>
       </Router>
